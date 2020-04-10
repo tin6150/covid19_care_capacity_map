@@ -23,9 +23,9 @@ FILES
 
 ::
 
-	capacity_v_pop.sketch.csv 		# sketch, combination of care capacity by state and some manual add on data for state population and number of cases
+	capacity_v_pop.sketch.csv 	# sketch, combination of care capacity by state and some manual add on data for state population and number of cases
 	kff_capacity_dw_2020_0409.csv	# care capacity (hospital beds) from KPP.org downloaded on 2020.04.09
-	kff_cases_dw_2020_0409.csv		# covid19 cases by state, downloaded 2020.04.09 (may find better data elsewhere?)
+	kff_cases_dw_2020_0409.csv	# covid19 cases by state, downloaded 2020.04.09 (may find better data elsewhere?)
 	kff_testing_dw_2020_0409.csv	# covid19 tests by state, downloaded 2020.04.09 
 
 
