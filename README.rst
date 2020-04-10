@@ -1,20 +1,20 @@
 covid19_care_capacity_map
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Hospital bed capacity by state vs covid19 cases
 
-hospital bed capacity by state vs covid19 cases
+May help present problem to those shrugging the COVID19 problem off?
 
 
 
 
 https://www.kff.org/health-costs/issue-brief/state-data-and-policy-actions-to-address-coronavirus/#stateleveldata
-	 ploy this against a map of population data, per state.
-
-	kpp same page has covid19 cases and deaths, but no date on the data…
+- ploy this against a map of population data, per state.
+- kff on same page has covid19 cases and deaths, but no date on the data…
 
 	
-	There are likely newer data, but here is a rough guide of population by state:
-		https://en.wikipedia.org/wiki/List_of_states_and_territories_of_the_United_States_by_population
+* There are likely newer data, but here is a rough guide of population by state:
+  https://en.wikipedia.org/wiki/List_of_states_and_territories_of_the_United_States_by_population
 		
 		
 		
@@ -37,4 +37,7 @@ Ref
 * https://pages.semanticscholar.org/coronavirus-research
 
 
-.. # vim: shiftwidth=4 tabstop=4 noexpandtab paste 
+
+
+.. # use 8-space tab as that's how github render the rst
+.. # vim: shiftwidth=8 tabstop=8 noexpandtab paste 
