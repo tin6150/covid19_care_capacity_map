@@ -1,9 +1,10 @@
 covid19_care_capacity_map
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Hospital bed capacity by state vs covid19 cases
-
-May help present problem to those shrugging the COVID19 problem off?
+Hospital bed capacity by state vs covid19 cases  
+May help present problem to those shrugging the COVID19 problem off?  \
+For now plan to display hospital bed and hospitalized patient count \
+Ideally also get ICU bed count and usage.
 
 
 
@@ -99,8 +100,7 @@ Snippet of state polygon from stateData.geojson:
 
 .. code:: geojson
 
-    //{ "type": "FeatureCollection", "features": [
-        {
+    //{ "type": "FeatureCollection", "features": [ {
             "type":         "Feature",
             "id":           "01",
             "properties": {
@@ -110,7 +110,7 @@ Snippet of state polygon from stateData.geojson:
 	... ]]}},
     //]}
 
-.. code:: geojson
+.. code:: geojson5
 
         {"type":"Feature","id":"01","properties":{"name":"Alabama","density":94.65},
             "geometry":{"type":"Polygon","coordinates":[[[-87.359296,35.00118],[-85.606675,34.984749],
@@ -127,8 +127,8 @@ Snippet of state polygon from stateData.geojson:
 
 what mapbox would need, single date entry (ie, use diff file for data of another date, may create too many files). 
 Saving these as example files 
-    - singlePropertyEg.geojson
-    - nestedPropertyEg.geojson - properties has a list, one item per date, would mapbox take it?  can it be queried in web app? and colored correctly?  TBD
+ - singlePropertyEg.geojson
+ - nestedPropertyEg.geojson - properties has a list, one item per date, would mapbox take it?  can it be queried in web app? and colored correctly?  TBD
 
 .. code:: json5 
 
