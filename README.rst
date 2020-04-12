@@ -7,6 +7,9 @@ For now plan to display hospital bed and hospitalized patient count \
 Ideally also get ICU bed count and usage.
 
 
+.. .md two tailing white spaces cannot cause a hard line break  
+.. nor can \ 
+.. i wondered about: \ at the end, but that didnt work either
 
 
 DEV NOTES
@@ -79,7 +82,7 @@ SOURCE FILES
 	cases
 	covidtrack_daily.csv		# API download, should have historical case data for all states
 
-					# need a script to generate geojson...
+					# need a script to generate gson5 ...
 
 
 Data files for web app
@@ -110,6 +113,7 @@ Snippet of state polygon from stateData.geojson:
 	... ]]}},
     //]}
 
+.. github rst dont know geojson5, likely just parsed as vanilla text block.
 .. code:: geojson5
 
         {"type":"Feature","id":"01","properties":{"name":"Alabama","density":94.65},
@@ -127,7 +131,7 @@ Snippet of state polygon from stateData.geojson:
 
 what mapbox would need, single date entry (ie, use diff file for data of another date, may create too many files). 
 Saving these as example files 
- - singlePropertyEg.geojson
+ - singlePropertyEg.json5 - a geojson file, but have comments.  use json5 to convert as needed.
  - nestedPropertyEg.geojson - properties has a list, one item per date, would mapbox take it?  can it be queried in web app? and colored correctly?  TBD
 
 .. code:: json5 
