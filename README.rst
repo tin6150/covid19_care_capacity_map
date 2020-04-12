@@ -129,10 +129,8 @@ Snippet of state polygon from stateData.geojson:
 
 
 
-what mapbox would need, single date entry (ie, use diff file for data of another date, may create too many files). 
-Saving these as example files 
- - singlePropertyEg.json5 - a geojson file, but have comments.  use json5 to convert as needed.
- - nestedPropertyEg.geojson - properties has a list, one item per date, would mapbox take it?  can it be queried in web app? and colored correctly?  TBD
+Prototype 1 for what mapbox would need.  This one is a single date entry (ie, would use diff file for data of another date, may create too many files).   mapbox import ok, data format parsed as expected
+``json5 singlePropertyEg.json5 > singlePropertyEg.geojson``
 
 .. code:: json5 
 
@@ -169,6 +167,11 @@ Saving these as example files
 
         ] } // tagged as json5, comments would be allowed if parser supports this new version
 
+
+
+Prototype 2 alternate format for mapbox.  This one is use nesting, containing 2 date entres (ie, would use single datafile and upload to mapbox).
+see ``json5 nestedPropertyEg.json5 > nestedPropertyEg.geojson`` 
+would mapbox take it?  can it be queried in web app? and colored correctly?  TBD
 
 
 
