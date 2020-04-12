@@ -1,3 +1,10 @@
+node_modules/
+package-lock.json
+# ^^ i did npm install for some tools, but they are not really needed for this repo, just tool i use.
+
+
+#### dont remember what below came from, maybe github magic
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
