@@ -39,8 +39,10 @@ OLD Dev Notes
   leafletjs tutorial with actual geojson of state coordinate + population data from wikipedia and census. 
   js snippet containing geo-coordinated data: https://leafletjs.com/examples/choropleth/us-states.js
   
-
 * https://github.com/tin6150/inet-dev-class/tree/master/mapbox
+
+* https://blog.mapbox.com/the-net-neutrality-map-how-i-built-it-c387c9cb64a8 
+  TIPPEcanoe tool for manipulating shapefiles; anything on gson?
 
 
 Tools
