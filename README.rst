@@ -129,8 +129,8 @@ Snippet of state polygon from stateData.geojson:
 
 
 
-Prototype 1 for what mapbox would need.  This one is a single date entry (ie, would use diff file for data of another date, may create too many files).   mapbox import ok, data format parsed as expected
-``json5 singlePropertyEg.json5 > singlePropertyEg.geojson``
+Prototype 1: for what mapbox would need.  This one is a single date entry (ie, would use diff file for data of another date, may create too many files).   mapbox import ok, data format parsed as expected
+``json5 EgPropertySingle.json5 > singlePropertyEg.geojson``
 
 .. code:: json5 
 
@@ -170,10 +170,17 @@ Prototype 1 for what mapbox would need.  This one is a single date entry (ie, wo
 
 
 Prototype 2 alternate format for mapbox.  This one is use nesting, containing 2 date entres (ie, would use single datafile and upload to mapbox).
-see ``json5 nestedPropertyEg.json5 > nestedPropertyEg.geojson`` 
+see ``json5 EgPropertyArray.json5 > EgPropertyArray.geojson`` 
 would mapbox take it?  can it be queried in web app? and colored correctly?  TBD
+No, while could create correct .json, mapbox complained during import: ``Input failed. "properties" member should be object, but is an Array instead on line 1.``
 
+Thus, essentially, each Feature need to have its geometry.
+Multiple date entry for same state would need multiple feature, each with its own geometry (coordinate list).
+Then, may as well just have one file per date.
 
+Pros and cons of single .geojson vs many files, one per date:
+- single file will end up more compressible, faster to load, less javascript coding?
+- multiple file will be tried method as done for previous data viz proj with mapbox.
 
 Ref
 ===

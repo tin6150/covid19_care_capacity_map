@@ -1,8 +1,10 @@
+				// example of feature with array of obj in properties, but rejected by mapbox (though a valid .json) 
         { "type": "FeatureCollection", "features": [
 
             { "type":       "Feature",
               //"id":           "01",           // id was present in stateData.geojson, but not likely required by mapbox
-              "properties": {
+              "properties": //{
+                [{    
                     "date":          "20200411",              // date record refers to.  use this in map
                     "dateModified":  "2020-04-11T20:00:00Z",  // date in ISO 8601 format, but this is not date of the data, but admin work timestamp
                     "fips":                 6,  // state code, perhaps use as id for json record as well
@@ -17,7 +19,24 @@
                     "icubed":            "NA",  // dont have data for this
                     "density":          94.65,  // from stateData.geojson
                     "popolation":    39000123   // from wikipedia, calif has ~39M 
-              } // properties is required (at least for mapbox), even if empty.  could give it name or timestamp
+                },   // this is proper json, but mapbox wont take it, as it expect properties to be an obj and not an array.
+                { 
+                    "date":          "20200410",              // date record refers to.  use this in map
+                    "dateModified":  "2020-04-11T20:00:00Z",  // date in ISO 8601 format, but this is not date of the data, but admin work timestamp
+                    "fips":                 6,  // state code, perhaps use as id for json record as well
+                    "state":             "CA",
+                    "positive":         19400,
+                    "hospitalized":      5200,  // actual bed usage since no icubed count
+                    "inIcuCurrently":    1500,    
+                    "negative":        152600,  // dont really care for this
+                    "death":              500,
+                    "grade":              "B",
+                    "bed":               5000,  // from kff
+                    "icubed":            "NA",  // dont have data for this
+                    "density":          94.65,  // from stateData.geojson
+                    "popolation":    39000123   // from wikipedia, calif has ~39M 
+                }] 
+              //} // properties is required (at least for mapbox), even if empty.  could give it name or timestamp
               ,
               "geometry": { "type": "Polygon", "coordinates": [ [
                       [ -121.985, 37.407 ],     // LT // would actually be a much longer list of points for state boundary
