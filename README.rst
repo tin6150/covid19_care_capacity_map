@@ -178,8 +178,14 @@ Thus, essentially, each Feature need to have its geometry.
 Multiple date entry for same state would need multiple feature, each with its own geometry (coordinate list).
 Then, may as well just have one file per date.
 
+Correctly imported by mapbox: 
+  - EgPropertySingle_x2.json5
+  - EgPropertySingle_x3.json5
+
+
 Pros and cons of single .geojson vs many files, one per date:
-- single file will end up more compressible, faster to load, less javascript coding?
+
+- single file will end up more compressible, faster to load, less javascript coding?   Untested approach.
 - multiple file will be tried method as done for previous data viz proj with mapbox.
 
 Ref
