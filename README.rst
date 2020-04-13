@@ -178,7 +178,7 @@ Thus, essentially, each Feature need to have its geometry.
 Multiple date entry for same state would need multiple feature, each with its own geometry (coordinate list).
 Then, may as well just have one file per date.
 
-Correctly imported by mapbox: 
+Correctly imported by mapbox (tin117): 
   - EgPropertySingle_x2.json5
   - EgPropertySingle_x3.json5
 
