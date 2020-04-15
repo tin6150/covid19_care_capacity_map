@@ -214,7 +214,7 @@ function cb4map_on_load__covid() {
             //layers: ['delaware-tabblock2010-10-pophu-a0nmlv'] // this is 403 forbidden on 2020.0412
             //layers: ['tabblock2010_10_pophu']
             //layers: ['delaware']   // didn't work
-            //layers: ['statedata']  // from cholopleth tutorial, not sure what this name match to :(
+            //layers: ['statedata']  // from cholopleth tutorial, not sure what this name match to :/
         });
 
         if (states.length > 0) {
@@ -234,19 +234,21 @@ function cb4map_on_load__covid() {
         } else {
             document.getElementById('pd').innerHTML = '<p>Hover over a census track :)</p>';
         };
-		// why is this indented??    am i missing bracked somewhere??  or is it vi smartindent bug??!!
-
     });
 };  
 
-function cb_dbgBoxInfo() {
+
+// this callback to handle mousemove should work now
+function cb_dbgBoxInfo(e) {
         var states = map.queryRenderedFeatures(e.point, {
             layers: ['egPropertySingle-x3']
             //layers: ['delaware-tabblock2010-10-pophu-a0nmlv'] // this is 403 forbidden on 2020.0412
             //layers: ['tabblock2010_10_pophu']
             //layers: ['delaware']   // didn't work
             //layers: ['statedata']  // from cholopleth tutorial, not sure what this name match to :/
-        });
+		});
+        var features = map.queryRenderedFeatures(e.point);
+        document.getElementById('featuresDbg').innerHTML = JSON.stringify(features, null, 2);
 };
 
 //map.on('load', function() {
