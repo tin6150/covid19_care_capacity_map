@@ -6,6 +6,8 @@ May help present problem to those shrugging the COVID19 problem off?  \
 For now plan to display hospital bed and hospitalized patient count \
 Ideally also get ICU bed count and usage.
 
+URL: https://tin6150.github.io/covid19_care_capacity_map/
+
 
 .. .md two tailing white spaces cannot cause a hard line break  
 .. nor can \ 
@@ -143,16 +145,19 @@ Prototype 1: for what mapbox would need.  This one is a single date entry (ie, w
                     "dateModified":  "2020-04-11T20:00:00Z",  // date in ISO 8601 format, but this is not date of the data, but admin work timestamp
                     "fips":                 6,	// state code, perhaps use as id for json record as well
                     "state":             "CA",
-                    "positive":         19472,
+                    "positive":         19472,  // Total cumulative positive test results.
                     "hospitalized":      5236,  // actual bed usage since no icubed count
                     "inIcuCurrently":    1591,    
                     "negative":        152604,  // dont really care for this
                     "death":              541,
                     "grade":              "B",
-                    "bed":               5000,  // from kff
+                    "bed":               5000,  // from kff.  at first wont handle case with bed number change
                     "icubed":            "NA",  // dont have data for this
-                    "density":          94.65,  // from stateData.geojson
-                    "popolation":    39000123   // from wikipedia, calif has ~39M 
+                    "popolation":    39000123,  // from wikipedia, calif has ~39M 
+                    "case2bed":         0.001,  // calculated ratio/%: hospitilized/bed
+                    "icu2icuBedRat":    0.000,  // calculated %: icu case / icu bed, 0 when dont have this data. 
+                    "positive2pop":     0.001,  // % pop positive (is positive number cumilative?)
+                    "density":          94.65   // from stateData.geojson, maybe drop
               } // properties is required (at least for mapbox), even if empty.  could give it name or timestamp
               ,
               "geometry": { "type": "Polygon", "coordinates": [ [
@@ -198,6 +203,8 @@ Ref
 * Example geoJSON: https://www.mapbox.com/help/data/stations.geojson
 * Additional ref: https://www.mapbox.com/help/define-geojson/
 
+* mapbox tutorial multi-date data in .geojson: https://docs.mapbox.com/help/tutorials/show-changes-over-time/ , 
+  with local test as: https://tin6150.github.io/covid19_care_capacity_map/eg_nyc_collision_map.html 
 
 .. # use 8-space tab as that's how github render the rst
 .. # vim: shiftwidth=8 tabstop=8 noexpandtab paste 
