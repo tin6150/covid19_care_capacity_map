@@ -184,14 +184,26 @@ Multiple date entry for same state would need multiple feature, each with its ow
 Then, may as well just have one file per date.
 
 Correctly imported by mapbox (tin117): 
-  - EgPropertySingle_x2.json5
-  - EgPropertySingle_x3.json5
-
+- EgPropertySingle_x2.json5
+- EgPropertySingle_x3.json5
 
 Pros and cons of single .geojson vs many files, one per date:
 
 - single file will end up more compressible, faster to load, less javascript coding?   Untested approach.
 - multiple file will be tried method as done for previous data viz proj with mapbox.
+- maybe mood point now, dont actually need to upload to mapbox and generate tileset (though that may actually be faster?)
+
+Algorithm
+=========
+
+* .geojson can be stored on fs, instead of a tileset in mapbox server
+* single .geojson file, color like NYC collision eg
+* HI likely a multi polygon, so create a state.ndjson
+* csv-etl.py script to create csv with data i need, include the calculated columns
+* ndjson join :  csv(case) + kpp(bed count) --> ndjson 
+* ndjson join :  ndjson + state --> geojson
+* see details of csv2json, join, map at https://github.com/mbostock/ndjson-cli
+
 
 Ref
 ===
@@ -203,8 +215,10 @@ Ref
 * Example geoJSON: https://www.mapbox.com/help/data/stations.geojson
 * Additional ref: https://www.mapbox.com/help/define-geojson/
 
-* mapbox tutorial multi-date data in .geojson: https://docs.mapbox.com/help/tutorials/show-changes-over-time/ , 
-  with local test as: https://tin6150.github.io/covid19_care_capacity_map/eg_nyc_collision_map.html 
+* mapbox tutorial multi-date data in .geojson (NYC collision): https://docs.mapbox.com/help/tutorials/show-changes-over-time/ , 
+  with personalized test at: https://tin6150.github.io/covid19_care_capacity_map/eg_nyc_collision_map.html 
+
+
 
 .. # use 8-space tab as that's how github render the rst
 .. # vim: shiftwidth=8 tabstop=8 noexpandtab paste 
