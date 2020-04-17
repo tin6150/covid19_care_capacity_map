@@ -152,8 +152,14 @@ p {
 <div id='console'>
   <h1>Motor vehicle collisions</h1>
   <p>Data: <a href='https://data.cityofnewyork.us/Public-Safety/NYPD-Motor-Vehicle-Collisions/h9gi-nx95'>Motor vehicle collision injuries and deaths</a> in NYC, Jan 2016</p>
-</div>
 
+  	<!-- slider control UI -->
+	<div class='session' id='sliderbar'>
+	  <h2>Hour: <label id='active-hour'>12PM</label></h2>
+	  <input id='slider' class='row' type='range' min='0' max='23' step='1' value='12' />
+	</div>
+
+</div>
 
 <script>
 
@@ -254,7 +260,7 @@ function cb_dbgBoxInfo(e) {
 //map.on('load', function() {
 function cb4map_on_load__nyc_collision() {
 	console.log("--dbg--L240: in cb4map_on_load__nyc_collision()" );
-    map.getCanvas().style.cursor = 'default';
+	map.getCanvas().style.cursor = 'default';
 	map.addLayer({
 		id: 'collisions',
 		type: 'circle', //'triangle',
@@ -283,7 +289,24 @@ function cb4map_on_load__nyc_collision() {
 		  ],
 		  'circle-opacity': 0.8
 		}
+	});  // end map.addLayer()
+
+	// trying to add filter for the data , toward end of tutorial in "Add interactivity"
+	document.getElementById('slider').addEventListener('input', function(e) {
+	  var hour = parseInt(e.target.value);
+	  // update the map
+	  // so mapbox API still used to do the filtering... so how these map to the .geojson?
+	  map.setFilter('collisions', ['==', ['number', ['get', 'Hour']], hour]);
+
+	  // converting 0-23 hour to AMPM format
+	  var ampm = hour >= 12 ? 'PM' : 'AM';
+	  var hour12 = hour % 12 ? hour % 12 : 12;
+
+	  // update text in the UI
+	  document.getElementById('active-hour').innerText = hour12 + ampm;
 	});
+
+
     map.on('mousemove', cb_dbgBoxInfo);
 }
 //)
