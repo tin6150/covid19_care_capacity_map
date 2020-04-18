@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
-<!-- vim: shiftwidth=4 tabstop=4 noexpandtab paste -->
+<!-- vim: shiftwidth=4 tabstop=4 noexpandtab paste  background=dark
+-->
 <!-- mapbox tutorial multi-date data in .geojson: https://docs.mapbox.com/help/tutorials/show-changes-over-time/ , 
   with local test as: https://tin6150.github.io/covid19_care_capacity_map/eg_nyc_collision_map.html 
 -->
@@ -158,6 +159,19 @@ p {
 	  <h2>Hour: <label id='active-hour'>12PM</label></h2>
 	  <input id='slider' class='row' type='range' min='0' max='23' step='1' value='12' />
 	</div>
+	
+	<!-- radio button selection UI -->
+	  <div class='session'>
+    <h2>Day of the week</h2>
+    <div class='row' id='filters'>
+      <input id='all' type='radio' name='toggle' value='all' checked='checked'>
+      <label for='all'>All</label>
+      <input id='weekday' type='radio' name='toggle' value='weekday'>
+      <label for='weekday'>Weekday</label>
+      <input id='weekend' type='radio' name='toggle' value='weekend'>
+      <label for='weekend'>Weekend</label>
+    </div>
+  </div>
 
 </div>
 
@@ -174,18 +188,18 @@ mapboxgl.accessToken = 'pk.eyJ1IjoidGluMTE3IiwiYSI6ImNrNWxnd21ydjBvc2UzZG8wanQza
 // const map = new mapboxgl.Map({ 
 var map = new mapboxgl.Map({
     container: 'map', // container id
-	style: 'mapbox://styles/tin117/ck8xway380ojo1isg3z408rc9',   // covid19-monochrome  2020-0412
+    style: 'mapbox://styles/tin117/ck8xway380ojo1isg3z408rc9',   // covid19-monochrome  2020-0412
 
     attributionControl: false,                  // setting to false remove the fine print at bottom.  I still have an info circle that pop up, should be good enough
     hash: true,     // change URL with a hash of map zoom/lat/long    eg append: #15/37.434/-121.945   # notice it is lat/long in this url!!  so it is zoom/y/x
 
 
     //minZoom: 2,  // studio have census track data avail in zoom 10 to 22, trying to see if can have data show up with much less detail (ie lower zoom num)
-	       // nope, minZoom here can't overwrite studio data limit.
+                   // nope, minZoom here can't overwrite studio data limit.
     //maxZoom:15,  // avoid over zooming in, since this is for state level data
 
     zoom: 12,
-	center: [-74.0059, 40.7128], // initial map center in [lon, lat] (NYC)
+    center: [-74.0059, 40.7128], // initial map center in [lon, lat] (NYC)
     //center: [-122.447303, 37.753574]   SF
     //center: [-121.945, 37.434],  // alviso ZWEDC
 });
@@ -252,7 +266,7 @@ function cb_dbgBoxInfo(e) {
             //layers: ['tabblock2010_10_pophu']
             //layers: ['delaware']   // didn't work
             //layers: ['statedata']  // from cholopleth tutorial, not sure what this name match to :/
-		});
+        });
         var features = map.queryRenderedFeatures(e.point);
         document.getElementById('featuresDbg').innerHTML = JSON.stringify(features, null, 2);
 };
@@ -268,7 +282,8 @@ function cb4map_on_load__nyc_collision() {
 			type: 'geojson',
 			data: './eg_nyc_collision1601.geojson' 
 		},
-		paint: {
+		// https://docs.mapbox.com/mapbox-gl-js/style-spec/expressions/#interpolate
+		paint: {		// this is the mapbox EXPRESSION api to dynamically change styling (instead of having defined it in mapbox studio as part of the layer
 		  'circle-radius': [
 			'interpolate',
 			['linear'],
@@ -288,22 +303,13 @@ function cb4map_on_load__nyc_collision() {
 			5, '#AA5E79'
 		  ],
 		  'circle-opacity': 0.8
-		}
+		} 
 	});  // end map.addLayer()
-
-	// trying to add filter for the data , toward end of tutorial in "Add interactivity"
+	
+	// filter option, first it was static, 
+	// then changed to depend on DOM input, see toward end of tutorial in "Add interactivity"
 	document.getElementById('slider').addEventListener('input', function(e) {
-	  var hour = parseInt(e.target.value);
-	  // update the map
-	  // so mapbox API still used to do the filtering... so how these map to the .geojson?
-	  map.setFilter('collisions', ['==', ['number', ['get', 'Hour']], hour]);
 
-	  // converting 0-23 hour to AMPM format
-	  var ampm = hour >= 12 ? 'PM' : 'AM';
-	  var hour12 = hour % 12 ? hour % 12 : 12;
-
-	  // update text in the UI
-	  document.getElementById('active-hour').innerText = hour12 + ampm;
 	});
 
 
