@@ -161,7 +161,7 @@ p {
 	</div>
 	
 	<!-- radio button selection UI -->
-	  <div class='session'>
+	<div class='session'>
     <h2>Day of the week</h2>
     <div class='row' id='filters'>
       <input id='all' type='radio' name='toggle' value='all' checked='checked'>
@@ -308,9 +308,26 @@ function cb4map_on_load__nyc_collision() {
 	
 	// filter option, first it was static, 
 	// then changed to depend on DOM input, see toward end of tutorial in "Add interactivity"
+	// trying to add filter for the data , toward end of tutorial in "Add interactivity"
 	document.getElementById('slider').addEventListener('input', function(e) {
+	  var hour = parseInt(e.target.value);
+	  // update the map
+	  // so mapbox API still used to do the filtering... so how these map to the .geojson?
+	  map.setFilter('collisions', ['==', ['number', ['get', 'Hour']], hour]);
+	  //             ^^^1^^^^^^                       ^2^^^^^^2^^     ^^3^
+	  // ^1^: the first param for setFilter is 'collision', which match the name of 'id' for map.addLayer(...)
+	  // ^2^: 'Hour' is one of the properties in the .geojson
+	  // ^3%: 'hour' is read as var from document.getElementById(...)
 
+	  // converting 0-23 hour to AMPM format
+	  var ampm = hour >= 12 ? 'PM' : 'AM';
+	  var hour12 = hour % 12 ? hour % 12 : 12;
+
+	  // update text in the UI
+	  document.getElementById('active-hour').innerText = hour12 + ampm;
 	});
+
+
 
 
     map.on('mousemove', cb_dbgBoxInfo);
