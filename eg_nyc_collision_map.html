@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html>
+<!-- vim: shiftwidth=4 tabstop=4 noexpandtab paste -->
+<!-- mapbox tutorial multi-date data in .geojson: https://docs.mapbox.com/help/tutorials/show-changes-over-time/ , 
+  with local test as: https://tin6150.github.io/covid19_care_capacity_map/eg_nyc_collision_map.html 
+-->
+<!-- tin (at) berkeley.edu -->
+<head>
+  <meta charset='utf-8' />
+  <title>Mapbox GL JS with Census TIGER/line population data</title>
+  <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+
+  <script src='https://api.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.js'></script>
+  <link href='https://api.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.css' rel='stylesheet' />
+
+
+  <style type="text/css">
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+h2, h3 {
+  margin: 10px;
+  font-size: 1.2em;
+}
+
+        h3 {
+  font-size: 1em;
+}
+
+
+p {
+            font-size: 0.85em;
+            margin: 10px;
+            text-align: left;
+}
+
+/**
+* Set rules for how the map overlays
+* (info box and legend) will be displayed
+* on the page. */
+/* white small box top right */
+.map-overlay {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: rgba(250, 250, 250, 0.8);  /* 255 255 255 is pure white */
+  margin-right: 4px; /* choropleth used 20px */
+  font-family: Arial, sans-serif;
+  overflow: auto;
+  border-radius: 3px;
+}
+/* yellowish box bottom right */
+.map-overlay-dbg {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: rgba(250, 250, 224, 0.8);  /* this is greenish/yellowish */ 
+  margin-right: 4px; /* choropleth used 20px */
+  font-family: Arial, sans-serif;
+  overflow: auto;
+  border-radius: 3px;
+}
+
+
+/**
+* Create a position for the map
+* on the page */
+#map {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+}
+
+/* // # is not comment in css, probably cuz how html/url need to use # ...  */
+/* and the snafu was cuz i had the above comment using // and presumably caused a parse error and ignored the block below.  *sigh* */
+/* css validador would likely have been able to point that out and saved me hours of time!! */
+/* this specify the size of the top right info box */
+#features {
+            top: 0;
+            height: 190px;      /* formerly 100px */
+            margin-top: 10px;
+            width: 230px;      /* formerly 250px */
+}
+
+/* debug box, may need it bigger than 600 x 400 */
+#featuresDbg {
+            top: 110;
+            height: 700px;      /* formerly 100px */
+            margin-top: 20px;
+            width: 500px;      /* formerly 250px */
+}
+
+/* #legend { */
+#legend {
+  padding: 10px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  line-height: 18px;
+  height: 150px;
+  margin-bottom: 40px;
+  width: 100px;
+}
+
+.legend-key {
+  display: inline-block;
+  border-radius: 20%;
+  width: 10px;
+  height: 10px;
+  margin-right: 5px;
+}
+
+
+/** nyc collision example, where User Control is presented - Top Left **/
+#console {
+  position: absolute;
+  width: 240px;
+  margin: 10px;
+  padding: 10px 20px;
+  background-color: white;
+}
+
+
+</style>
+</head>
+
+
+<!--
+-->
+
+
+
+<body>
+
+<div id='map'></div>
+
+<!-- this create the top right info box -->
+<div class='map-overlay' id='features'>
+	<h2>Census population</h2> <!-- this is title of top right box -->
+	<div id='pd'><p>Hover to reveal Census TIGER/line population data</p></div>   <!-- static text, replaced later by JS -->
+</div>
+
+<!-- funny positioning by mapbox gl js?  it goes in the bottom right without obvious place where this is specified -->
+<div class='map-overlay-dbg' id='featuresDbg'>
+	<div id='pd'><p>(data via mapbox tileset)</p></div>   <!-- static text, replaced later by JS -->
+</div>
+
+
+<!-- nyc collision eg, top left user input "console" -->
+<div id='console'>
+  <h1>Motor vehicle collisions</h1>
+  <p>Data: <a href='https://data.cityofnewyork.us/Public-Safety/NYPD-Motor-Vehicle-Collisions/h9gi-nx95'>Motor vehicle collision injuries and deaths</a> in NYC, Jan 2016</p>
+
+  	<!-- slider control UI -->
+	<div class='session' id='sliderbar'>
+	  <h2>Hour: <label id='active-hour'>12PM</label></h2>
+	  <input id='slider' class='row' type='range' min='0' max='23' step='1' value='12' />
+	</div>
+
+</div>
+
+<script>
+
+// define access token
+mapboxgl.accessToken = 'pk.eyJ1IjoidGluMTE3IiwiYSI6ImNrNWxnd21ydjBvc2UzZG8wanQzaGwzcGIifQ.3_B2PYgav56oacPlVu5u9w';
+// above was presented by Studio Beta 2020.0412, for covid19-Monochrome (under tin117)
+// mapboxgl.accessToken = 'pk.eyJ1IjoiZXhhbXBsZXMiLCJhIjoiY2lqbmpqazdlMDBsdnRva284cWd3bm11byJ9.V6Hg2oYJwMAxeoR9GEzkAA';  
+// above is from tutorial solution
+// below is from my Mapbox Studio I think... 
+// mapboxgl.accessToken = 'pk.eyJ1Ijoic241MCIsImEiOiJjam8weWl0dm0wNWVhM3dubmgyb3hwaTZsIn0.2Cvl-nnhZAoavESou_RqiQ';
+
+// const map = new mapboxgl.Map({ 
+var map = new mapboxgl.Map({
+    container: 'map', // container id
+	style: 'mapbox://styles/tin117/ck8xway380ojo1isg3z408rc9',   // covid19-monochrome  2020-0412
+
+    attributionControl: false,                  // setting to false remove the fine print at bottom.  I still have an info circle that pop up, should be good enough
+    hash: true,     // change URL with a hash of map zoom/lat/long    eg append: #15/37.434/-121.945   # notice it is lat/long in this url!!  so it is zoom/y/x
+
+
+    //minZoom: 2,  // studio have census track data avail in zoom 10 to 22, trying to see if can have data show up with much less detail (ie lower zoom num)
+	       // nope, minZoom here can't overwrite studio data limit.
+    //maxZoom:15,  // avoid over zooming in, since this is for state level data
+
+    zoom: 12,
+	center: [-74.0059, 40.7128], // initial map center in [lon, lat] (NYC)
+    //center: [-122.447303, 37.753574]   SF
+    //center: [-121.945, 37.434],  // alviso ZWEDC
+});
+
+
+// creating this as callback for the main map.on('load', ... ) so thta can switch between diff version   
+function cb4map_on_load__covid() {
+	console.log("--dbg--L190: in cb4map_on_load__covid()" );
+    // apparently also has to be inside this map.on() block...
+    map.getCanvas().style.cursor = 'default';
+    //map.fitBounds([[-133.2421875, 16.972741], [-47.63671875, 52.696361]]);
+    //map.fitBounds([[-75.8, 38.5], [-75.0, 39.8]]);  // delaware census map, need to specify this or browser will load into middle f ocean!!
+    //map.fitBounds([[-75.7, 39.7], [-75.1, 39.8]]);  // boxing around Wilmington + show surrounding state (where there is no data)  // will "flyTo" wilmington, DE
+    //map.fitBounds([[-75.5, 39.7], [-75.6, 39.8]]);  // boxing around Wilmington, DE
+    //map.getCanvas().style.cursor = 'default';   // why was this repeated in example code? probably just bug. . .
+    // 3dots are some strange html/script thing that get parsed even inside comment!
+
+    // update when mouse over the map.
+    // apparently need this inside the map.on()  or it  doesn't work when placed outside of it
+
+    // this display all data as pop up
+    // ref: https://www.mapbox.com/mapbox-gl-js/example/queryrenderedfeatures/
+    map.on('mousemove', function (e) {
+        var features = map.queryRenderedFeatures(e.point);
+        document.getElementById('featuresDbg').innerHTML = JSON.stringify(features, null, 2);
+    });
+
+    // change info window on hover  // the mousemove capture should be inside the 'load' per tutorial solution.
+    map.on('mousemove', function (e) {
+        var states = map.queryRenderedFeatures(e.point, {
+            layers: ['egPropertySingle-x3']
+            //layers: ['delaware-tabblock2010-10-pophu-a0nmlv'] // this is 403 forbidden on 2020.0412
+            //layers: ['tabblock2010_10_pophu']
+            //layers: ['delaware']   // didn't work
+            //layers: ['statedata']  // from cholopleth tutorial, not sure what this name match to :/
+        });
+
+        if (states.length > 0) {
+            document.getElementById('pd').innerHTML 
+            =             "<strong> pop:"   + states[0].properties.POP10 + "</strong><p>" 
+			+ "blockce: "  	    + states[0].properties.BLOCKCE + "<br>" 
+			+ "blockid10: "     + states[0].properties.BLOCKID10 + "<br>"
+			+ "countyfp10: "    + states[0].properties.COUNTYFP10 + "<br>"
+			+ "housing10: "     + states[0].properties.HOUSING10 + "<br>"
+			+ "partflg: "       + states[0].properties.PARTFLG + "<br>"
+			+ "statefp10: "     + states[0].properties.STATEFP10 + "<br>"
+			+ "tractce10: "     + states[0].properties.TRACECE10 + "<br>"
+            + "</p>";
+            //= "<h3><strong>" + states[0].properties.name 
+            //+ "</strong></h3><p><strong><em>" + states[0].properties.density 
+            //+ "</strong> people per square mile</em></p>";
+        } else {
+            document.getElementById('pd').innerHTML = '<p>Hover over a census track :)</p>';
+        };
+    });
+};  
+
+
+// this callback to handle mousemove should work now
+function cb_dbgBoxInfo(e) {
+        var states = map.queryRenderedFeatures(e.point, {
+            layers: ['egPropertySingle-x3']
+            //layers: ['delaware-tabblock2010-10-pophu-a0nmlv'] // this is 403 forbidden on 2020.0412
+            //layers: ['tabblock2010_10_pophu']
+            //layers: ['delaware']   // didn't work
+            //layers: ['statedata']  // from cholopleth tutorial, not sure what this name match to :/
+		});
+        var features = map.queryRenderedFeatures(e.point);
+        document.getElementById('featuresDbg').innerHTML = JSON.stringify(features, null, 2);
+};
+
+//map.on('load', function() {
+function cb4map_on_load__nyc_collision() {
+	console.log("--dbg--L240: in cb4map_on_load__nyc_collision()" );
+	map.getCanvas().style.cursor = 'default';
+	map.addLayer({
+		id: 'collisions',
+		type: 'circle', //'triangle',
+		source: { 
+			type: 'geojson',
+			data: './eg_nyc_collision1601.geojson' 
+		},
+		paint: {
+		  'circle-radius': [
+			'interpolate',
+			['linear'],
+			['number', ['get', 'Casualty']],
+			0, 4,
+			5, 24
+		  ],
+		  'circle-color': [
+			'interpolate',
+			['linear'],
+			['number', ['get', 'Casualty']],
+			0, '#2DC4B2',
+			1, '#3BB3C3',
+			2, '#669EC4',
+			3, '#8B88B6',
+			4, '#A2719B',
+			5, '#AA5E79'
+		  ],
+		  'circle-opacity': 0.8
+		}
+	});  // end map.addLayer()
+
+	// trying to add filter for the data , toward end of tutorial in "Add interactivity"
+	document.getElementById('slider').addEventListener('input', function(e) {
+	  var hour = parseInt(e.target.value);
+	  // update the map
+	  // so mapbox API still used to do the filtering... so how these map to the .geojson?
+	  map.setFilter('collisions', ['==', ['number', ['get', 'Hour']], hour]);
+
+	  // converting 0-23 hour to AMPM format
+	  var ampm = hour >= 12 ? 'PM' : 'AM';
+	  var hour12 = hour % 12 ? hour % 12 : 12;
+
+	  // update text in the UI
+	  document.getElementById('active-hour').innerText = hour12 + ampm;
+	});
+
+
+    map.on('mousemove', cb_dbgBoxInfo);
+}
+//)
+;
+
+
+// wait for map to load before adjusting it
+console.log("--dbg--L445: right before map.on('load',cb4map_on_load__covid)" );
+//map.on('load', cb4map_on_load__covid) 
+map.on('load', cb4map_on_load__nyc_collision) 
+console.log("--dbg--L446: right after map.on('load',cb4map_on_load__covid)" );
+console.log("--dbg--L447: the-end of script section, no more code, but likely exec early cuz of async nature and all the call backs!)" );
+
+// js callbacks tutorial: https://github.com/maxogden/art-of-node#callbacks
+
+
+//);
+</script>
+gist on how this was put together: https://gist.github.com/tin6150/e271e5d3bef6d93ebc6817170ddd2456/ 
+</body>
+</html>

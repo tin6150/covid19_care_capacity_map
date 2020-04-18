@@ -1,3 +1,18 @@
+node_modules/
+package-lock.json
+# ^^ i did npm install for some tools, but they are not really needed for this repo, just tool i use.
+#
+# tmp files i don't need checked in
+singlePropertyEg.geojson
+singlePropertyEg.svg
+nestedPropertyEg.geojson
+nestedPropertyEg.svg
+EgProperty*.geojson
+EgProperty*.svg
+
+
+#### dont remember what below came from, maybe github magic
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
