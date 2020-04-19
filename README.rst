@@ -224,7 +224,6 @@ cat stateData.ndjson | ndjson-map 'd.Location = d.properties.name, d' > stateDat
 # inner join seems appropriate.  ndjson-join could not take key "two level down" the json object, thus the earlier step of creating field with matching name as key
 # below get 51 record, decent
 ndjson-join        'd.Location'                        kff_capacity_dw_2020_0409.ndjson stateData-loc.ndjson > capacity+state.ndjson    # 51 entries now.  
-ndjson-join        'd.Location'  stateData-loc.ndjson  kff_capacity_dw_2020_0409.ndjson                      > capacity+state.ndjson    # 51 entries now, decent **join** ## **4**   trying with geometry as d[0]
 
 # result of 1 entry below, split into multiple lines by me.  Note it has two elements, as d[0] and d[1] # ??
 
