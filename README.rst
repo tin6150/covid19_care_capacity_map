@@ -272,11 +272,11 @@ ndjson-reduce 'p.features.push(d), p' '{type: "FeatureCollection", features: []}
                                    |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^||^-------<<<--- re-add the opener needed to create geojson
                                    more cler of where ndjson data get shoved into
 
-resulting features had extra [] ... maybe need method 1 instead ...  nope, produce same file with extra []
 
-cuz ca-albers-density.ndjson started as {}, not [{ }]
-is it just one opening and tailing [ ] ??
+*tin@Tin-U55:~/tin-gh/covid19_care_capacity_map$ git commit -a -m "ok, finally got a working geojson map with data in it!"*
 
+
+**add cases data, may need to go back and go thru the cycle again**
 
 
 *think all ndjson files are tmp and can be rm*
