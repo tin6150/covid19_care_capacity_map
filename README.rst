@@ -219,9 +219,6 @@ cat stateData.geojson | json5 | ndjson-split 'd.features' > stateData.ndjson # 5
 
 cat stateData.ndjson | ndjson-map 'd.Location = d.properties.name, d' > stateData-loc.ndjson #  **add mapping, create key field for join**
 
-
-#XXndjson-join        'd.Location, d.name'            kff_capacity_dw_2020_0409.ndjson stateData.ndjson > capacity+state.ndjson    # 2704 entry, cant be right **??** not sure if need d.properties.name
-#XX ndjson-join        'd.Location  d.properties.name' kff_capacity_dw_2020_0409.ndjson stateData.ndjson > capacity+state.ndjson    # not accepting join condition, so need to do a map before hand.
 ndjson-join        'd.Location'                    kff_capacity_dw_2020_0409.ndjson stateData-loc.ndjson > capacity+state.ndjson    # 51 entries now, decent **join**
 
 # result of 1 entry below, split into multiple lines by me.  Note it has two elements, as d[0] and d[1] # ??
@@ -235,7 +232,6 @@ ndjson-join        'd.Location'                    kff_capacity_dw_2020_0409.ndj
   "Location":"Alabama"}]
 
 # above ndjson are two items, need to remap as single element.  could add calculated fields too, see tutorial
-#XX ndjson-map 'd[0].properties = {density: Math.floor(d[1].B01003 / d[0].properties.ALAND * 2589975.2356)}, d[0]'  < ca-albers-join.ndjson  > ca-albers-density.ndjson
 #XX ndjson-map 'd[0].properties = {density: Math.floor(d[1].B01003 / d[0].properties.ALAND * 2589975.2356)}, d[0]'  < ca-albers-join.ndjson  > ca-albers-density.ndjson
 
 tbd ...  good nite for now...
