@@ -11,7 +11,8 @@ URL: https://tin6150.github.io/covid19_care_capacity_map/
 
 .. .md two tailing white spaces cannot cause a hard line break  
 .. nor can \ 
-.. i wondered about: \ at the end, but that didnt work either
+.. i wondered about: \
+ at the end, but that didnt work either
 
 
 DEV NOTES
@@ -205,6 +206,19 @@ Algorithm
 * ndjson join :  csv(case) + kpp(bed count) --> ndjson 
 * ndjson join :  ndjson + state --> geojson
 * see details of csv2json, join, map at https://github.com/mbostock/ndjson-cli
+
+Detail steps 
+------------ 
+
+::
+
+# there are comments at top and bottom of the csv from kff, may need to clean them first 
+cat kff_capacity_dw_2020_0409.csv  | fgrep '",' | csv2json -n > kff_capacity_dw_2020_0409.ndjson # Alaska, Alabama 
+
+cat stateData.geojson | json5 | ndjson-split 'd.features' > stateData.ndjson # 52 "states": Alabama, Hawaii, Puerto Rico
+
+ndjson-join        'd.Location, d.name' kff_capacity_dw_2020_0409.ndjson stateData.ndjson > capacity+state.ndjson
+    # consider --left 
 
 
 Dev Env
