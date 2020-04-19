@@ -210,16 +210,21 @@ Algorithm
 Detail steps 
 ------------ 
 
-::
-
-# there are comments at top and bottom of the csv from kff, may need to clean them first 
+# there are comments at top and bottom of the csv from kff, may need to clean them first :
 cat kff_capacity_dw_2020_0409.csv  | fgrep '",' | csv2json -n > kff_capacity_dw_2020_0409.ndjson # Alaska, Alabama  # 69 entries
 
+# convert geojson to ndjson, note that ndjson-split can't handle newline in its input, thus the filter via json5i :
 cat stateData.geojson | json5 | ndjson-split 'd.features' > stateData.ndjson # 52 "states": Alabama, Hawaii, Puerto Rico  # **no mapping yet**
 
+# add a Location column to ndjson, so that it can be used as key for join , via ndjson-map cmd :
 cat stateData.ndjson | ndjson-map 'd.Location = d.properties.name, d' > stateData-loc.ndjson #  **add mapping, create key field for join**
 
-ndjson-join        'd.Location'                    kff_capacity_dw_2020_0409.ndjson stateData-loc.ndjson > capacity+state.ndjson    # 51 entries now, decent **join**
+**Step 4 join**
+# perforn ndjson-join of  bed capacity + state shape data :
+# inner join seems appropriate.  ndjson-join could not take key "two level down" the json object, thus the earlier step of creating field with matching name as key
+# below get 51 record, decent
+ndjson-join        'd.Location'                        kff_capacity_dw_2020_0409.ndjson stateData-loc.ndjson > capacity+state.ndjson    # 51 entries now.  
+ndjson-join        'd.Location'  stateData-loc.ndjson  kff_capacity_dw_2020_0409.ndjson                      > capacity+state.ndjson    # 51 entries now, decent **join** ## **4**   trying with geometry as d[0]
 
 # result of 1 entry below, split into multiple lines by me.  Note it has two elements, as d[0] and d[1] # ??
 
@@ -236,11 +241,35 @@ ndjson-join        'd.Location'                    kff_capacity_dw_2020_0409.ndj
 
 tbd ...  good nite for now...
 
-ndjson-map '{
+# reshape the ndjson structure (result above are split into 2 element array, 
+  need to at least `map` the important data into the first array element 
+  actually, turn from 2-element array into single object, which mean strip outermost [ ] of each entry (ndjson line).
+  use ndjson-map :
+  **do i really need to do this?  try without first**   Seems needed.
 
-cat ca-albers-density.ndjson | ndjson-reduce | ndjson-map '{type: "FeatureCollection", features: d}'  > ca-albers-density.json
+ndjson-map 'd[0].properties = {density: Math.floor(d[1].B01003 / d[0].properties.ALAND * 2589975.2356)}, d[0]'  < ca-albers-join.ndjson  > ca-albers-density.ndjson  # **5** **re-map/restructure**
+
+
+ndjson-map '{ d[].properties = d[1] 
+  **5** **re-map/restructure**
+
+
+# convert ndjson to regular geojson, need to add some "opener" structure into the json - 
+cat capacity+state.ndjson    | ndjson-reduce | ndjson-map '{type: "FeatureCollection", features: d}'  > capacity+state-m1.geojson # **dont use this version**  **6a**
                                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^*^ readd the opener needed to create geojson
 
+ndjson-reduce 'p.features.push(d), p' '{type: "FeatureCollection", features: []}'  < capacity+state.ndjson > capacity+state.geojson  # **6b** **ndj2geo** **method 2 w/ ndjson-reduce;  i like this better** 
+                                   |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^||^-------<<<--- re-add the opener needed to create geojson
+                                   more cler of where ndjson data get shoved into
+
+resulting features had extra [] ... maybe need method 1 instead ...  nope, produce same file with extra []
+
+cuz ca-albers-density.ndjson started as {}, not [{ }]
+is it just one opening and tailing [ ] ??
+                                                           
+                                                           
+                                                           
+Ref: https://github.com/tin6150/inet-dev-class/blob/master/mapbox/eg_data_ndjson/README.rst
 
 
 Dev Env
