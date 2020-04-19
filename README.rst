@@ -265,10 +265,10 @@ ndjson-map 'd[0].properties = { name: d[0].properties.name, TotalHospitalBed: d[
 
 **Step 6: ndj2geo**
 # convert ndjson to regular geojson, need to add some "opener" structure into the json - 
-cat capacity+state.ndjson    | ndjson-reduce | ndjson-map '{type: "FeatureCollection", features: d}'  > capacity+state-m1.geojson # **dont use this version**  **6a**
+cat capacity+state.ndjson    | ndjson-reduce | ndjson-map '{type: "FeatureCollection", features: d}'  > capacity+state-m1.geojson # Step 6a: i dont like this method, use 6b below
                                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^*^ readd the opener needed to create geojson
 
-ndjson-reduce 'p.features.push(d), p' '{type: "FeatureCollection", features: []}'  < capacity+state.ndjson > capacity+state.geojson  # **6b** **ndj2geo** **method 2 w/ ndjson-reduce;  i like this better** 
+ndjson-reduce 'p.features.push(d), p' '{type: "FeatureCollection", features: []}'  < state+capacity.remapped.ndjson > state+capacity.geojson  # **6b** **ndj2geo** **method 2 w/ ndjson-reduce;  i like this better** 
                                    |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^||^-------<<<--- re-add the opener needed to create geojson
                                    more cler of where ndjson data get shoved into
 
@@ -276,10 +276,10 @@ resulting features had extra [] ... maybe need method 1 instead ...  nope, produ
 
 cuz ca-albers-density.ndjson started as {}, not [{ }]
 is it just one opening and tailing [ ] ??
-                                                           
-                                                           
-                                                           
 
+
+
+*think all ndjson files are tmp and can be rm*
 
 Dev Env
 =======
