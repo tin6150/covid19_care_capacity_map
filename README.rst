@@ -89,6 +89,12 @@ SOURCE FILES
 
 					# need a script to generate gson5 ...
 
+* https://coronavirus.1point3acres.com/en/data  JHU get US data from them!
+* jhu
+* wikipedia
+* https://www.trackcorona.live/api
+* https://www.cdph.ca.gov/Programs/CID/DCDC/Pages/Immunization/ncov2019.aspx ??
+
 
 Data files for web app
 ----------------------
@@ -228,6 +234,7 @@ Ref
 
 * mapbox tutorial multi-date data in .geojson (NYC collision): https://docs.mapbox.com/help/tutorials/show-changes-over-time/ , 
   with personalized test at: https://tin6150.github.io/covid19_care_capacity_map/eg_nyc_collision_map.html 
+
 
 
 

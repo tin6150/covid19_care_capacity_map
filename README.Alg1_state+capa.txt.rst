@@ -1,15 +1,18 @@
 
-Algorithm 1
+Algorithm A
 ===========
+
+Result: state+capacity.geojson that displays correctly, but no map for it yet.
 
 State geojson + care capacity data
 
 This was the first attempt.
-Got state+capacity.geojson that displays correctly, but no map for it yet.
 
 Had to learn lot of ndjson-cli command to convert file structure and do join
 
 Info mostly from README at git log 69ebe7f
+
+(Formerly Algorith 1, renamed to make steps highlight between diff version/incarnation)
 
 
 SOURCE FILES

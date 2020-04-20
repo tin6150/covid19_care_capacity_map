@@ -13,10 +13,12 @@ EgProperty*.svg
 stateData-albers.svg
 
 TMP_TEST_OUT/
-TMP_ndjson/
 kff_capacity_dw_2020_0409.prepd.csv
 
 *.swp
+
+TMP_ndjson/
+stateAbbr.ndjson
 
 
 #### dont remember what below came from, maybe github magic
