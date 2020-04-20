@@ -335,15 +335,15 @@ function cb4map_on_load__nyc_collision() {
 	// https://stackoverflow.com/questions/51166886/how-to-fill-color-for-a-region-based-on-value-in-mapbox
 	// caair.html
 	//--map.addSource('population', {
-	map.addSource('states', {
+	map.addSource('covid19', {
 		'type': 'geojson',
 		'data': './state+capacity+cases.geojson'
 	})
 	map.addLayer({
 		//id: 'covidtracking',
-		id: 'states',
+		id: 'covid19',
 		type: 'fill', // 'vector', 'circle',
-		source: 'states',
+		source: 'covid19',
 		//source: { type: 'geojson', data: './state+capacity+cases.geojson' },
 		//'source-layer': './state+capacity+cases.geojson',
 		// https://docs.mapbox.com/mapbox-gl-js/style-spec/expressions/#interpolate
@@ -351,16 +351,17 @@ function cb4map_on_load__nyc_collision() {
 			'fill-color': [
                 'interpolate',
                 ['linear'],
-                ['get', 'population'],
+                //['get', 'population'],
+                ['get', 'positive'],
                 0, '#F2F12D',
-                500000, '#EED322',
-                750000, '#E6B71E',
-                1000000, '#DA9C20',
-                2500000, '#CA8323',
-                5000000, '#B86B25',
-                7500000, '#A25626',
-                10000000, '#8B4225',
-                25000000, '#723122'
+                50, '#EED322',
+                75, '#E6B71E',
+                100, '#DA9C20',
+                250, '#CA8323',
+                500, '#B86B25',
+                750, '#A25626',
+                10000, '#8B4225',
+                25000, '#723122'
 			],
 		    //'fill-color': [ "curve", ["step"], ["number", ["get", "density"], 1], "#FFEDA0", 10, "#FED976", 20, "#FEB24C", 50, "#FD8D3C", 100, "#FC4E2A", 200, "#E31A1C", 500, "#BD0026", 2000, "#000000" ],
 		    // use a curve (http://bl.ocks.org/anandthakker/raw/6d0269825a7e0381cdcde13f84a0b6b0/#types-expression-curve)
@@ -369,7 +370,7 @@ function cb4map_on_load__nyc_collision() {
 		    // Each step is then a pair [{color code}, {max value for break}]
 		    // Finally, add a default color code for any features that fall outside of the steps you've defined.
 		    //-"curve", ["step"], ["number", ["get", "density"], 1], "#FFEDA0", 10, "#FED976", 20, "#FEB24C", 50, "#FD8D3C", 100, "#FC4E2A", 200, "#E31A1C", 500, "#BD0026", 2000, "#000000"
-			'fill-opacity': 0.8
+			'fill-opacity': 0.4
 		},
 		layout: {}
 
