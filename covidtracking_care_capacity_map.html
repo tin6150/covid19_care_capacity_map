@@ -102,9 +102,9 @@ p {
 /* debug box, may need it bigger than 600 x 400 BR */
 #featuresDbg {
             top: 110;
-            height: 500px;      /* formerly 100px */
+            height: 220px;      /* formerly 100px */
             margin-top: 20px;
-            width: 600px;      /* formerly 250px */
+            width: 700px;      /* formerly 250px */
 }
 
 /* #legend { */
@@ -205,20 +205,22 @@ p {
 
   	<!-- slider control UI -->
 	<div class='session' id='sliderbar'>
-	  <h2>Hour: <label id='active-hour'>12PM</label></h2>
-	  <input id='slider' class='row' type='range' min='0' max='23' step='1' value='12' />
+	  <h2>Date: <label id='active-hour'>4/19</label></h2>
+	  <input id='slider' class='row' type='range' min='0' max='365' step='1' value='139' />
 	</div>
 	
 	<!-- radio button selection UI -->
 	<div class='session'>
     <h2>Day of the week</h2>
     <div class='row' id='filters'>
-      <input id='all' type='radio' name='toggle' value='all' checked='checked'>
-      <label for='all'>All</label>
-      <input id='weekday' type='radio' name='toggle' value='weekday'>
-      <label for='weekday'>Weekday</label>
-      <input id='weekend' type='radio' name='toggle' value='weekend'>
-      <label for='weekend'>Weekend</label>
+      <input id='Hosp' type='radio' name='toggle' value='HospRatio' checked='checked'>
+      <label for='Hospitilization/Hosp.Beds'>Hosp</label>
+
+      <input id='ICU/ICU Beds' type='radio' name='toggle' value='IcuRatio'>
+      <label for='ICU/ICU Beds'>ICUratio</label>
+
+      <input id='positive' type='radio' name='toggle' value='positive'>
+      <label for='positive'>positive</label>
     </div>
   </div>
 
@@ -357,9 +359,9 @@ function cb4map_on_load__nyc_collision() {
                 50, '#EED322',
                 75, '#E6B71E',
                 100, '#DA9C20',
-                250, '#CA8323',
-                500, '#B86B25',
-                750, '#A25626',
+                1000, '#CA8323',
+                3000, '#B86B25',
+                7500, '#A25626',
                 10000, '#8B4225',
                 25000, '#723122'
 			],
