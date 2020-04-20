@@ -227,8 +227,8 @@ p {
 <script>
 
 // define access token
-mapboxgl.accessToken = 'pk.eyJ1IjoiZXhhbXBsZXMiLCJhIjoiY2lqbmpqazdlMDBsdnRva284cWd3bm11byJ9.V6Hg2oYJwMAxeoR9GEzkAA'; // census choropleth tutorial
-//mapboxgl.accessToken = 'pk.eyJ1IjoidGluMTE3IiwiYSI6ImNrNWxnd21ydjBvc2UzZG8wanQzaGwzcGIifQ.3_B2PYgav56oacPlVu5u9w';  // tin117 for nyc/covid19
+//mapboxgl.accessToken = 'pk.eyJ1IjoiZXhhbXBsZXMiLCJhIjoiY2lqbmpqazdlMDBsdnRva284cWd3bm11byJ9.V6Hg2oYJwMAxeoR9GEzkAA'; // census choropleth tutorial
+mapboxgl.accessToken = 'pk.eyJ1IjoidGluMTE3IiwiYSI6ImNrNWxnd21ydjBvc2UzZG8wanQzaGwzcGIifQ.3_B2PYgav56oacPlVu5u9w';  // tin117 for nyc/covid19
 // above was presented by Studio Beta 2020.0412, for covid19-Monochrome (under tin117)
 // mapboxgl.accessToken = 'pk.eyJ1IjoiZXhhbXBsZXMiLCJhIjoiY2lqbmpqazdlMDBsdnRva284cWd3bm11byJ9.V6Hg2oYJwMAxeoR9GEzkAA';  
 // above is from tutorial solution
@@ -238,8 +238,8 @@ mapboxgl.accessToken = 'pk.eyJ1IjoiZXhhbXBsZXMiLCJhIjoiY2lqbmpqazdlMDBsdnRva284c
 // const map = new mapboxgl.Map({ 
 var map = new mapboxgl.Map({
     container: 'map', // container id
-    style: 'mapbox://styles/examples/cjgioozof002u2sr5k7t14dim', // map style URL from Mapbox Studio // census choropleth tutorial
-    //style: 'mapbox://styles/tin117/ck8xway380ojo1isg3z408rc9',   // covid19-monochrome  2020-0412
+    //style: 'mapbox://styles/examples/cjgioozof002u2sr5k7t14dim', // map style URL from Mapbox Studio // census choropleth tutorial
+    style: 'mapbox://styles/tin117/ck8xway380ojo1isg3z408rc9',   // covid19-monochrome  2020-0412
 
 
     attributionControl: true,                  // if setting to false remove the fine print at bottom.  I still have an info circle that pop up, should be good enough
@@ -286,11 +286,11 @@ function cb4map_on_load__covid() {
         var states = map.queryRenderedFeatures(e.point, {
             //layers: ['egPropertySingle-x3']
             //layers: ['capacity']
-            //layers: ['states']
+            layers: ['states']
             //layers: ['delaware-tabblock2010-10-pophu-a0nmlv'] // this is 403 forbidden on 2020.0412
             //layers: ['tabblock2010_10_pophu']
             //layers: ['delaware']   // didn't work
-            layers: ['statedata']  // from cholopleth tutorial, not sure what this name match to :/
+            //layers: ['statedata']  // from cholopleth tutorial, not sure what this name match to :/
         });
 
         if (states.length > 0) {
@@ -332,29 +332,44 @@ function cb_dbgBoxInfo(e) {
 function cb4map_on_load__nyc_collision() {
 	console.log("--dbg--L240: in cb4map_on_load__nyc_collision()" );
 	map.getCanvas().style.cursor = 'default';
+	// https://stackoverflow.com/questions/51166886/how-to-fill-color-for-a-region-based-on-value-in-mapbox
+	// caair.html
+	//--map.addSource('population', {
+	map.addSource('states', {
+		'type': 'geojson',
+		'data': './state+capacity+cases.geojson'
+	})
 	map.addLayer({
 		//id: 'covidtracking',
 		id: 'states',
 		type: 'fill', // 'vector', 'circle',
-		source: { 
-			type: 'geojson',
-			//data: './eg_nyc_collision1601.geojson' 
-			data: './state+capacity+cases.geojson'
-		},
-		'source-layer': './state+capacity+cases.geojson',
+		source: 'states',
+		//source: { type: 'geojson', data: './state+capacity+cases.geojson' },
+		//'source-layer': './state+capacity+cases.geojson',
 		// https://docs.mapbox.com/mapbox-gl-js/style-spec/expressions/#interpolate
 		paint: {		///* this is the mapbox EXPRESSION api to dynamically change styling (instead of having defined it in mapbox studio as part of the layer)*/
-		  'fill-color': [
+			'fill-color': [
+                'interpolate',
+                ['linear'],
+                ['get', 'population'],
+                0, '#F2F12D',
+                500000, '#EED322',
+                750000, '#E6B71E',
+                1000000, '#DA9C20',
+                2500000, '#CA8323',
+                5000000, '#B86B25',
+                7500000, '#A25626',
+                10000000, '#8B4225',
+                25000000, '#723122'
+			],
+		    //'fill-color': [ "curve", ["step"], ["number", ["get", "density"], 1], "#FFEDA0", 10, "#FED976", 20, "#FEB24C", 50, "#FD8D3C", 100, "#FC4E2A", 200, "#E31A1C", 500, "#BD0026", 2000, "#000000" ],
 		    // use a curve (http://bl.ocks.org/anandthakker/raw/6d0269825a7e0381cdcde13f84a0b6b0/#types-expression-curve)
 		    // of type "step," which will step through each break instead of interpolating between them.
 		    // Then, get the density value and use a `number` expression to return it as a number instead of a string.
 		    // Each step is then a pair [{color code}, {max value for break}]
 		    // Finally, add a default color code for any features that fall outside of the steps you've defined.
-		    "curve",
-		      //["step"], ["number", ["get", "density"], 1], "#FFEDA0", 10, "#FED976", 20, "#FEB24C", 50, "#FD8D3C", 100, "#FC4E2A", 200, "#E31A1C", 500, "#BD0026", 2000, "#000000"
-		      ["step"], ["number", ["get", "density"], 1], "#FFEDA0", 10, "#FED976", 20, "#FEB24C", 50, "#FD8D3C", 100, "#FC4E2A", 200, "#E31A1C", 500, "#BD0026", 2000, "#000000"
-		  ],
-		  'fill-opacity': 0.8
+		    //-"curve", ["step"], ["number", ["get", "density"], 1], "#FFEDA0", 10, "#FED976", 20, "#FEB24C", 50, "#FD8D3C", 100, "#FC4E2A", 200, "#E31A1C", 500, "#BD0026", 2000, "#000000"
+			'fill-opacity': 0.8
 		},
 		layout: {}
 
@@ -408,8 +423,8 @@ function cb4map_on_load__nyc_collision() {
 
 // wait for map to load before adjusting it
 console.log("--dbg--L445: right before map.on('load',cb4map_on_load__covid)" );
-map.on('load', cb4map_on_load__covid)   // see if can read geojson data in dbg box
-//++map.on('load', cb4map_on_load__nyc_collision)  // UI input was in this callback fn
+//~~map.on('load', cb4map_on_load__covid)   // see if can read geojson data in dbg box
+map.on('load', cb4map_on_load__nyc_collision)  // UI input was in this callback fn
 console.log("--dbg--L446: right after map.on('load',cb4map_on_load__covid)" );
 console.log("--dbg--L447: the-end of script section, no more code, but likely exec early cuz of async nature and all the call backs!)" );
 
