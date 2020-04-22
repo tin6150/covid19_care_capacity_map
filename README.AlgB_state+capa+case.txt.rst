@@ -131,7 +131,7 @@ cat stateData.ndjson | ndjson-map 'd.Location = d.properties.name, d' > stateDat
 # perforn ndjson-join of : state shape data & (bed capacity + cases ) :
 # inner join seems appropriate.  ndjson-join could not take key "two level down" the json object, thus the earlier step of creating field with matching name as key
 # below get 2287 entries, both input and output file.
-ndjson-join  'd.Location'  stateData-loc.ndjson  capacity+cases.remapped.ndjson    > state+capacity+cases.ndjson    # **B4**join**   
+ndjson-join  'd.Location'  stateData-loc.ndjson  capacity+cases.remapped.ndjson    > state+capacity+cases.ndjson    # **B4c**join**   
 
 # result of 1 entry below, split into multiple lines by me.  Note it has two elements, as d[0] and d[1] # ??
 
