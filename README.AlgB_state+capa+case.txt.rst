@@ -122,7 +122,8 @@ cat stateData.geojson | json5 | ndjson-split 'd.features' > stateData.ndjson # 5
 
 **Step A2: add key [AlgA]** 
 # add a Location column to ndjson, so that it can be used as key for join , via ndjson-map cmd :
-cat stateData.ndjson | ndjson-map 'd.Location = d.properties.name, d' > stateData-loc.ndjson #  **add mapping, create key field for join**
+cat stateData.ndjson | ndjson-map 'd.Location = d.properties.name, d' > stateData-loc.ndjson #  **duplicate column(field) cuz need fieldname to match for join**
+# **add key via mapping, create key field for join**
 
 ~~~~
 
