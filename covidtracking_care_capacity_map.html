@@ -261,61 +261,6 @@ var map = new mapboxgl.Map({
     //center: [-121.945, 37.434],  // alviso ZWEDC
 });
 
-
-// creating this as callback for the main map.on('load', ... ) so thta can switch between diff version   
-function cb4map_on_load__covid_obsolete() {
-    console.log("--dbg--L190: in cb4map_on_load__covid()" );
-    // apparently also has to be inside this map.on() block...
-    map.getCanvas().style.cursor = 'default';
-    //map.fitBounds([[-133.2421875, 16.972741], [-47.63671875, 52.696361]]);
-    //map.fitBounds([[-75.8, 38.5], [-75.0, 39.8]]);  // delaware census map, need to specify this or browser will load into middle f ocean!!
-    //map.fitBounds([[-75.7, 39.7], [-75.1, 39.8]]);  // boxing around Wilmington + show surrounding state (where there is no data)  // will "flyTo" wilmington, DE
-    //map.fitBounds([[-75.5, 39.7], [-75.6, 39.8]]);  // boxing around Wilmington, DE
-    //map.getCanvas().style.cursor = 'default';   // why was this repeated in example code? probably just bug. . .
-    // 3dots are some strange html/script thing that get parsed even inside comment!
-
-    // update when mouse over the map.
-    // apparently need this inside the map.on()  or it  doesn't work when placed outside of it
-
-    // this display all data as pop up
-    // ref: https://www.mapbox.com/mapbox-gl-js/example/queryrenderedfeatures/
-    map.on('mousemove', function (e) {
-        var features = map.queryRenderedFeatures(e.point);
-        document.getElementById('featuresDbg').innerHTML = JSON.stringify(features, null, 2);
-    });
-
-    // change info window on hover  // the mousemove capture should be inside the 'load' per tutorial solution.
-    console.log("--trc-- L288: right before map.on-mousemove, about to render text for TL feature box");
-    map.on('mousemove', function (e) {
-        var states = map.queryRenderedFeatures(e.point, {
-            //layers: ['egPropertySingle-x3']
-            //layers: ['capacity']
-            layers: ['states']
-            //layers: ['delaware-tabblock2010-10-pophu-a0nmlv'] // this is 403 forbidden on 2020.0412
-            //layers: ['tabblock2010_10_pophu']
-            //layers: ['delaware']   // didn't work
-            //layers: ['statedata']  // from cholopleth tutorial, not sure what this name match to :/
-        });
-
-        if (states.length > 0) {
-            document.getElementById('pd').innerHTML 
-            = "Hosp Bed Util: "    + states[0].properties.BedUtil + "<BR>" 
-			+ "Bed Per 1000 pop: " + states[0].properties.HospitalBedsPer1kPop + "<br>" 
-			+ "positive cases: "   + states[0].properties.positive + "<br>" ;
-
-             //"<strong> pop:"   + states[0].properties.POP10 + "</strong><p>" 
-			//+ "statefp10: "     + states[0].properties.STATEFP10 + "<br>"
-            //+ "</p>";
-            //= "<h3><strong>" + states[0].properties.name 
-            //+ "</strong></h3><p><strong><em>" + states[0].properties.density 
-            //+ "</strong> people per square mile</em></p>";
-        } else {
-            document.getElementById('pd').innerHTML = '<p>Hover over a State ^_^</p>';
-        };
-    });
-};  // end function cb4map_on_load__covid() 
-
-
 // this update the TL overlay data box named feature in the html div
 function cb4mouseMove_featuresDataBoxInfo(e) {
         console.log( "--trc-- L319: inside cb4mouseMove_featuresDataBoxInfo(...)" );
