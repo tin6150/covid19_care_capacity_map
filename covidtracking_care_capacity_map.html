@@ -108,9 +108,9 @@ p {
 /* debug box, BR, yellow-ish, may need it bigger than 600 x 400 */
 #featuresDbg {
     /*top: 110; */
-    height: 150px;      /* formerly 100px */
     margin-top: 20px;
-    width: 250px;      /* formerly 250px */
+    height: 360px;      /* formerly 100px */
+    width:  500px;      /* formerly 250px */
 }
 
 
@@ -123,7 +123,7 @@ p {
   left: 0;
   background: rgba(106, 221, 236, 0.8);  /* this is cyain-ish */ 
   margin-left: 4px; /* choropleth used 20px */
-  margin-bottom: 26px; /* leave some space for mapbox logo */
+  margin-bottom: 16px; /* 28px needed for mapbox logo */
   font-family: Arial, sans-serif;
   overflow: auto;
   border-radius: 3px;
@@ -133,8 +133,8 @@ p {
 #featuresDbg2 {
     /*top: 110; */
     /*margin-top: 20px; */
-    height: 400px;   
-    width: 500px;    
+    height: 360px;   
+    width:  500px;    
 }
 
 
@@ -205,7 +205,7 @@ p {
 <!-- this create the top right info box -->
 <div class='map-overlay' id='features'>
 	<h2>Hospital Utilization</h2> <!-- this is title of top right box -->
-	<div id='pd'><p>Hover to Bed Utilization</p></div>   <!-- static text, replaced later by JS -->
+	<div id='pd'><p>Hover to show capacity data.</p></div>   <!-- static text, replaced later by JS -->
 </div>
 
 <!-- funny positioning by mapbox gl js?  it goes in the bottom right without obvious place where this is specified -->
@@ -311,20 +311,25 @@ function cb4mouseMove_featuresDataBoxInfo(e) {
             //layers: ['statedata']  // from cholopleth tutorial, not sure what this name match to :/
         });
         text2display = "no data yet";
+        dbgText2display = "no data yet";
         dbgText2display = JSON.stringify(states);  //tmp dbg use
+        dbg2Text2display = "no data yet";
 
         if (states.length > 0) {
             text2display = 
-              "Hosp Bed Util: "    + states[0].properties.BedUtil + "<BR>" 
+               "Location: "         + states[0].properties.Location + "<BR>" 
+             + "Hosp Bed Util: "    + states[0].properties.BedUtil + "<BR>" 
              + "Bed Per 1000 pop: " + states[0].properties.HospitalBedsPer1kPop + "<br>" 
              + "positive cases: "   + states[0].properties.positive + "<br>" ;
 
             dbgText2display = JSON.stringify(states);  //tmp dbg use
+            dbg2Text2display = JSON.stringify(states[0]);  //tmp dbg use
         } else {
             text2display += '<p>Hooover...</p>';
         };
-        document.getElementById('pd').innerHTML = text2display;   // pd is inside TR overlay box
-        document.getElementById('dbgBox2').innerHTML = dbgText2display;   // dbgBox2 is inside BL overlay box dbg2
+        document.getElementById('pd').innerHTML = text2display;           // pd is inside TR overlay box
+        document.getElementById('dbgBox2').innerHTML  = dbgText2display;   // dbgBox  is BR overlay box dbg    // why cant use dbgBox ? complain is null...
+        document.getElementById('dbgBox2').innerHTML = dbg2Text2display;  // dbgBox2 is BL overlay box dbg2
 };  //end cb4mouseMove_featuresDataBoxInfo()
 
 
