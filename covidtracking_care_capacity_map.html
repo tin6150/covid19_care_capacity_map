@@ -36,24 +36,24 @@
 /* css validador would likely have been able to point that out and saved me hours of time!! */
 
 body {
-  margin: 0;
-  padding: 0;
+    margin: 0;
+    padding: 0;
 }
 
 h2, h3 {
-  margin: 10px;
-  font-size: 1.2em;
+    margin: 10px;
+    font-size: 1.2em;
 }
 
 h3 {
-  font-size: 1em;
+    font-size: 1em;
 }
 
 
 p {
-            font-size: 0.85em;
-            margin: 10px;
-            text-align: left;
+    font-size: 0.85em;
+    margin: 10px;
+    text-align: left;
 }
 
 
@@ -61,10 +61,10 @@ p {
 * Create a position for the map on the html page
 * currently occupy the whole page */
 #map {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 100%;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	width: 100%;
 }
 
 
@@ -75,21 +75,21 @@ p {
 * on the page. */
 /* white small box top right TR */
 .map-overlay {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  background: rgba(250, 250, 250, 0.8);  /* 255 255 255 is pure white */
-  margin-right: 4px; /* choropleth used 20px */
-  font-family: Arial, sans-serif;
-  overflow: auto;
-  border-radius: 3px;
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	background: rgba(250, 250, 250, 0.8);  /* 255 255 255 is pure white */
+	margin-right: 4px; /* choropleth used 20px */
+	font-family: Arial, sans-serif;
+	overflow: auto;
+	border-radius: 3px;
 }
 /* this specify the size of the top right info box TR */
 #features {
-            top: 0;
-            height: 250px;      /* formerly 190px */
-            margin-top: 10px;
-            width: 230px;      /* formerly 250px */
+    top: 0;
+    height: 190px;      /* formerly 190px */
+    margin-top: 10px;
+    width: 250px;      /* formerly 250px */
 }
 
 
@@ -107,10 +107,10 @@ p {
 }
 /* debug box, BR, yellow-ish, may need it bigger than 600 x 400 */
 #featuresDbg {
-            top: 110;
-            height: 200px;      /* formerly 100px */
-            margin-top: 20px;
-            width: 250px;      /* formerly 250px */
+    /*top: 110; */
+    height: 400px;      /* formerly 100px */
+    margin-top: 20px;
+    width: 450px;      /* formerly 250px */
 }
 
 
@@ -130,11 +130,13 @@ p {
 }
 
 /* debug box2 BL, cyain-ish, may need it bigger than 600 x 400 */
+/* there are some strangeness.  this size has to be smaller than BR dbg box defined above */
+/* or maybe size just not heeded here at all... bug below... */
 #featuresDbg2 {
-            top: 110;
-            margin-top: 20px;
-            height: 400px;   
-            width: 500px;    
+    /*top: 110; */
+    /*margin-top: 20px; */
+    height: 200px;   
+    width: 300px;    
 }
 
 
@@ -212,7 +214,7 @@ p {
 <div class='map-overlay-dbg' id='featuresDbg'><!-- BR yellowish box -->
 	<div id='dbgBox'><p>(data via mapbox tileset)</p></div>   <!-- static text, replaced later by JS -->
 </div>
-<div class='map-overlay-dbg' id='featuresDbg'><!-- BL cyanish box-->
+<div class='map-overlay-dbg2' id='featuresDbg'><!-- BL cyanish box-->
 	<div id='dbgBox2'><p>(dbg for queried data via)</p></div>   <!-- static text, replaced later by JS -->
 </div>
 
@@ -316,8 +318,8 @@ function cb4mouseMove_featuresDataBoxInfo(e) {
         if (states.length > 0) {
             text2display = 
               "Hosp Bed Util: "    + states[0].properties.BedUtil + "<BR>" 
-			      + "Bed Per 1000 pop: " + states[0].properties.HospitalBedsPer1kPop + "<br>" 
-			      + "positive cases: "   + states[0].properties.positive + "<br>" ;
+             + "Bed Per 1000 pop: " + states[0].properties.HospitalBedsPer1kPop + "<br>" 
+             + "positive cases: "   + states[0].properties.positive + "<br>" ;
 
             dbgText2display = JSON.stringify(states);  //tmp dbg use
         } else {
