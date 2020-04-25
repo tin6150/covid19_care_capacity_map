@@ -78,5 +78,5 @@ ndjson-reduce 'p.features.push(d), p' '{type: "FeatureCollection", features: []}
 # OutGson should be state+capacity+cases.geojson  # **6b** **ndj2geo**
 
 
-exit $?
+cd -
 
