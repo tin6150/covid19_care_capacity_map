@@ -70,14 +70,28 @@ p {
 /* yellowish box bottom right BR */
 .map-overlay-dbg {
   position: absolute;
-  bottom: 0;
+  bottom: 0;  
   right: 0;
   background: rgba(250, 250, 224, 0.8);  /* this is greenish/yellowish */ 
   margin-right: 4px; /* choropleth used 20px */
+  margin-bottom: 16px; /* leave some space for copyright/attribution */
   font-family: Arial, sans-serif;
   overflow: auto;
   border-radius: 3px;
 }
+/* cyan-ish box bottom left BL */
+.map-overlay-dbg2 {
+  position: absolute;
+  bottom: 0;  
+  left: 0;
+  background: rgba(106, 221, 236, 0.8);  /* this is cyain-ish */ 
+  margin-left: 4px; /* choropleth used 20px */
+  margin-bottom: 26px; /* leave some space for mapbox logo */
+  font-family: Arial, sans-serif;
+  overflow: auto;
+  border-radius: 3px;
+}
+
 
 
 /**
@@ -101,13 +115,22 @@ p {
             width: 230px;      /* formerly 250px */
 }
 
-/* debug box, may need it bigger than 600 x 400 BR */
+/* debug box, BR, yellow-ish, may need it bigger than 600 x 400 */
 #featuresDbg {
             top: 110;
-            height: 220px;      /* formerly 100px */
+            height: 200px;      /* formerly 100px */
             margin-top: 20px;
-            width: 700px;      /* formerly 250px */
+            width: 250px;      /* formerly 250px */
 }
+
+/* debug box2 BL, cyain-ish, may need it bigger than 600 x 400 */
+#featuresDbg2 {
+            top: 110;
+            margin-top: 20px;
+            height: 400px;   
+            width: 500px;    
+}
+
 
 /* #legend { */
 #legend {
@@ -178,8 +201,11 @@ p {
 </div>
 
 <!-- funny positioning by mapbox gl js?  it goes in the bottom right without obvious place where this is specified -->
-<div class='map-overlay-dbg' id='featuresDbg'>
-	<div id='pd'><p>(data via mapbox tileset)</p></div>   <!-- static text, replaced later by JS -->
+<div class='map-overlay-dbg' id='featuresDbg'><!-- BR yellowish box -->
+	<div id='dbgBox'><p>(data via mapbox tileset)</p></div>   <!-- static text, replaced later by JS -->
+</div>
+<div class='map-overlay-dbg' id='featuresDbg'><!-- BL cyanish box-->
+	<div id='dbgBox2'><p>(dbg for queried data via)</p></div>   <!-- static text, replaced later by JS -->
 </div>
 
 
@@ -237,6 +263,7 @@ mapboxgl.accessToken = 'pk.eyJ1IjoidGluMTE3IiwiYSI6ImNrNWxnd21ydjBvc2UzZG8wanQza
 // below is from my Mapbox Studio I think... 
 // mapboxgl.accessToken = 'pk.eyJ1Ijoic241MCIsImEiOiJjam8weWl0dm0wNWVhM3dubmgyb3hwaTZsIn0.2Cvl-nnhZAoavESou_RqiQ';
 
+
 // const map = new mapboxgl.Map({ 
 console.log("--dbg--L242: right before new mapboxgl.Map(...)" );
 var map = new mapboxgl.Map({
@@ -244,9 +271,8 @@ var map = new mapboxgl.Map({
     //style: 'mapbox://styles/examples/cjgioozof002u2sr5k7t14dim', // map style URL from Mapbox Studio // census choropleth tutorial
     style: 'mapbox://styles/tin117/ck8xway380ojo1isg3z408rc9',   // covid19-monochrome  2020-0412
 
-
-    attributionControl: true,                  // if setting to false remove the fine print at bottom.  I still have an info circle that pop up, should be good enough
-    hash: true,     // change URL with a hash of map zoom/lat/long    eg append: #15/37.434/-121.945   # notice it is lat/long in this url!!  so it is zoom/y/x
+    attributionControl: false,                  // if setting to false remove the fine print at bottom.  I still have an info circle that pop up, should be good enough
+    //hash: true,     // change URL with a hash of map zoom/lat/long    eg append: #15/37.434/-121.945   # notice it is lat/long in this url!!  so it is zoom/y/x
 
 
     //minZoom: 2,  // studio have census track data avail in zoom 10 to 22, trying to see if can have data show up with much less detail (ie lower zoom num)
@@ -261,6 +287,7 @@ var map = new mapboxgl.Map({
     //center: [-121.945, 37.434],  // alviso ZWEDC
 });
 
+
 // this update the TL overlay data box named feature in the html div
 function cb4mouseMove_featuresDataBoxInfo(e) {
         console.log( "--trc-- L319: inside cb4mouseMove_featuresDataBoxInfo(...)" );
@@ -268,21 +295,28 @@ function cb4mouseMove_featuresDataBoxInfo(e) {
             //layers: ['egPropertySingle-x3']
             //layers: ['capacity']
             //layers: ['states']
-            layers: ['covid19']
+            //layers: ['covid19']
+            layers: ['covid19-bedUtil']
             //layers: ['delaware-tabblock2010-10-pophu-a0nmlv'] // this is 403 forbidden on 2020.0412
             //layers: ['tabblock2010_10_pophu']
             //layers: ['delaware']   // didn't work
             //layers: ['statedata']  // from cholopleth tutorial, not sure what this name match to :/
         });
+        text2display = "no data yet";
+        dbgText2display = JSON.stringify(states);  //tmp dbg use
 
         if (states.length > 0) {
-            document.getElementById('pd').innerHTML 
-            = "Hosp Bed Util: "    + states[0].properties.BedUtil + "<BR>" 
-			+ "Bed Per 1000 pop: " + states[0].properties.HospitalBedsPer1kPop + "<br>" 
-			+ "positive cases: "   + states[0].properties.positive + "<br>" ;
+            text2display = 
+              "Hosp Bed Util: "    + states[0].properties.BedUtil + "<BR>" 
+			      + "Bed Per 1000 pop: " + states[0].properties.HospitalBedsPer1kPop + "<br>" 
+			      + "positive cases: "   + states[0].properties.positive + "<br>" ;
+
+            dbgText2display = JSON.stringify(states);  //tmp dbg use
         } else {
-            document.getElementById('pd').innerHTML = '<p>Hooover...</p>';
+            text2display += '<p>Hooover...</p>';
         };
+        document.getElementById('pd').innerHTML = text2display;   // pd is inside TR overlay box
+        document.getElementById('dbgBox2').innerHTML = dbgText2display;   // dbgBox2 is inside BL overlay box dbg2
 };  //end cb4mouseMove_featuresDataBoxInfo()
 
 
@@ -308,27 +342,24 @@ function cb4map_on_load__covidtracking() {
 	// https://stackoverflow.com/questions/51166886/how-to-fill-color-for-a-region-based-on-value-in-mapbox
 	// caair.html
 	//--map.addSource('population', {
-	map.addSource('covid19', {
+	map.addSource('covid19-cap+case', {  // see ZWEDC_50x50sq_js.html line 461
 		'type': 'geojson',
 		'data': './state+capacity+cases.geojson'
 	})
 
   console.log("--trc--L367: right before map.addLayer" )
 	map.addLayer({
-		//id: 'covidtracking',
-		id: 'covid19',
-		type: 'fill', // 'vector', 'circle',
-		source: 'covid19',
-		//source: { type: 'geojson', data: './state+capacity+cases.geojson' },
-		//'source-layer': './state+capacity+cases.geojson',
+		id: 'covid19-bedUtil',        //formerly id: 'covidtracking',
+		type: 'fill', // 'vector'
+		source: 'covid19-cap+case',
 		// https://docs.mapbox.com/mapbox-gl-js/style-spec/expressions/#interpolate
 		paint: {		///* this is the mapbox EXPRESSION api to dynamically change styling (instead of having defined it in mapbox studio as part of the layer)*/
 			'fill-color': [
                 'interpolate',
                 ['linear'],
-                //['get', 'positive'],
-                ['get', 'BedUtil'],       // change field here
-// 9 classes, multi-hue from light yellow to dark red.  
+                ['get', 'positive'],    //tmp use, no null here
+                //['get', 'BedUtil'],       // change field here
+// 9 classes, multi-hue from light yellow to dark red.  need to match legend drawn by html/css
 // https://colorbrewer2.org/?type=sequential&scheme=YlOrRd&n=9
   0,  '#ffffcc',
   1,  '#ffeda0',
@@ -352,19 +383,22 @@ function cb4map_on_load__covidtracking() {
 		layout: {}
 
 	});  // end map.addLayer()
+
+
+  // xref: see ZWEDC_50x50sq_js line 218 for map.on('zoom') to change legend scale
 	
 	// filter option, first it was static, 
 	// then changed to depend on DOM input, see toward end of tutorial in "Add interactivity"
 	// trying to add filter for the data , toward end of tutorial in "Add interactivity"
 	//map.setFilter('collisions', ['==', ['number', ['get', 'Hour']], 12]);
   //            "filter": ['==', ['type',['get', 'key']],'value']
-	map.setFilter('covid19', ['==', 'date', '20200419' ]);
+	//map.setFilter('covid19-bedUtil', ['==', 'date', '20200419' ]);
 	document.getElementById('slider').addEventListener('input', function(e) {
     console.log("--dbg--L413: inside slider parser" );
 	  var hour = parseInt(e.target.value);
 	  // update the map
 	  // so mapbox API still used to do the filtering... so how these map to the .geojson?
-	  map.setFilter('covid19', ['==', ['number', ['get', 'Hour']], hour]);
+	  //~~map.setFilter('covid19-bedUtil', ['==', ['number', ['get', 'Hour']], hour]);
 	  //map.setFilter('collisions', ['==', ['number', ['get', 'Hour']], hour]);
 	  //             ^^^1^^^^^^                       ^2^^^^^^2^^     ^^3^
 	  // ^1^: the first param for setFilter is 'collision', which match the name of 'id' for map.addLayer(...)
@@ -416,13 +450,22 @@ console.log("--dbg--L545: right before map.on('load',cb4map_on_load__covid)" );
 //~~map.on('load', cb4map_on_load__covid_obsolete)   // see if can read geojson data in dbg box
 map.on('load', cb4map_on_load__covidtracking)  // UI input was in this callback fn  
 console.log("--dbg--L546: right after map.on('load',cb4map_on_load__covid)" );
+
+map.addControl( new mapboxgl.NavigationControl(), 'top-right');  
+map.addControl(new mapboxgl.FullscreenControl({container: document.querySelector('body')}));
+
+// https://www.mapbox.com/mapbox-gl-js/api/#attributioncontrol
+map.addControl(new mapboxgl.AttributionControl({
+        compact: false,  // set to false to add an EXTRA line with info below prefixed.  true add an (i) icon
+        customAttribution: '(cc) Tin Ho <A HREF="https://github.com/tin6150/covid19_care_capacity_map">App Info</A>'
+}));
+//map.style.sourceCaches['attribution-layer']._source.attribution =  '<A HREF="https://github.com/tin6150/covid19_care_capacity_map">Smelly</A>';
+
+
 console.log("--dbg--L547: the-end of script section, no more code, but likely exec early cuz of async nature and all the call backs!)" );
 
+
 // js callbacks tutorial: https://github.com/maxogden/art-of-node#callbacks
-
-
-//);
 </script>
-gist on how this was put together: https://gist.github.com/tin6150/e271e5d3bef6d93ebc6817170ddd2456/ 
 </body>
 </html>
