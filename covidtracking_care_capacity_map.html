@@ -220,7 +220,7 @@ p {
 <!-- nyc collision eg, top left user input "console" -->
 <div id='console'>
   <h4>COVID19 Hospital bed utilization</h4>
-  <p>info tbd</p>
+  <p></p>
 
 	<!-- this is all that is needed to create a legend colorbar, no scripting req.
 		just html element!  well, actually, the css "row colors" is actually doing the color grading.    
@@ -243,19 +243,15 @@ p {
 	  <input id='slider' class='row' type='range' min='20200307' max='20200419' step='1' value='20200419' />
 	</div>
 	
-	<!-- radio button selection UI -->
-	<div class='session'>
-    <h2>Day of the week</h2>
-    <div class='row' id='filters'>
-      <input id='Hosp' type='radio' name='toggle' value='HospRatio' checked='checked'>
-      <label for='Hospitilization/Hosp.Beds'>Hosp</label>
-
-      <input id='ICU/ICU Beds' type='radio' name='toggle' value='IcuRatio'>
-      <label for='ICU/ICU Beds'>ICUratio</label>
-
-      <input id='positive' type='radio' name='toggle' value='positive'>
-      <label for='positive'>positive</label>
-    </div>
+	<!-- drop down picker selection UI -->
+  <!--<div class='dataClassPicker'> <!-- formerly 
+      -->
+  <div class='session'> 
+      <select id="dataClassSelectorUI">
+          <option value="Positive" >Positive cases</option> 
+          <option value="BedUtil"  >Hospital Bed Utilization</option> 
+          <option value="ICU" disabled >ICU cases</option> 
+      </select>
   </div>
 
 </div>
@@ -400,8 +396,7 @@ function cb4map_on_load__covidtracking() {
 	// trying to add filter for the data , toward end of tutorial in "Add interactivity"
 	//map.setFilter('collisions', ['==', ['number', ['get', 'Hour']], 12]);
   //            "filter":   ['==', ['type',  ['get', 'key']],'value']
-	//map.setFilter('cap+case', ['==', ['number',['get','date']], 20200419 ]);    // range 20200307 to 20200419 
-	//map.setFilter('cap+case', ['==', ['number',['get','date']], 20200319 ]);    // range 20200307 to 20200419 
+	map.setFilter('cap+case', ['==', ['number',['get','date']], 20200419 ]);    // range 20200307 to 20200419 
 	document.getElementById('slider').addEventListener('input', function(e) {
     console.log("--dbg--L413: inside slider parser" );
 	  var dateAsNum = parseInt(e.target.value);
