@@ -239,8 +239,8 @@ p {
 
  	<!-- slider control UI -->
 	<div class='session' id='sliderbar'>
-	  <h2>Date: <label id='active-hour'>4/19</label></h2>
-	  <input id='slider' class='row' type='range' min='0' max='365' step='1' value='139' />
+	  <h2>Date: <label id='active-date'>4/19</label></h2>
+	  <input id='slider' class='row' type='range' min='20200307' max='20200419' step='1' value='20200419' />
 	</div>
 	
 	<!-- radio button selection UI -->
@@ -399,26 +399,26 @@ function cb4map_on_load__covidtracking() {
 	// then changed to depend on DOM input, see toward end of tutorial in "Add interactivity"
 	// trying to add filter for the data , toward end of tutorial in "Add interactivity"
 	//map.setFilter('collisions', ['==', ['number', ['get', 'Hour']], 12]);
-  //            "filter": ['==', ['type',['get', 'key']],'value']
-	map.setFilter('cap+case', ['==', 'date', '20200419' ]);    // range 0307 to 0419 
+  //            "filter":   ['==', ['type',  ['get', 'key']],'value']
+	//map.setFilter('cap+case', ['==', ['number',['get','date']], 20200419 ]);    // range 20200307 to 20200419 
+	//map.setFilter('cap+case', ['==', ['number',['get','date']], 20200319 ]);    // range 20200307 to 20200419 
 	document.getElementById('slider').addEventListener('input', function(e) {
     console.log("--dbg--L413: inside slider parser" );
-	  var hour = parseInt(e.target.value);
+	  var dateAsNum = parseInt(e.target.value);
 	  // update the map
-	  // so mapbox API still used to do the filtering... so how these map to the .geojson?
-	  //~~map.setFilter('covid19-bedUtil', ['==', ['number', ['get', 'Hour']], hour]);
+	  // so mapbox API still used to do the filtering... think of grep for data locally before render
 	  //map.setFilter('collisions', ['==', ['number', ['get', 'Hour']], hour]);
-	  //             ^^^1^^^^^^                       ^2^^^^^^2^^     ^^3^
-	  // ^1^: the first param for setFilter is 'collision', which match the name of 'id' for map.addLayer(...)
-	  // ^2^: 'Hour' is one of the properties in the .geojson
-	  // ^3%: 'hour' is read as var from document.getElementById(...)
-
-	  // converting 0-23 hour to AMPM format
-	  var ampm = hour >= 12 ? 'PM' : 'AM';
-	  var hour12 = hour % 12 ? hour % 12 : 12;
-
+	  map.setFilter('cap+case', ['==', ['number',['get','date']], dateAsNum ]);    // range 20200307 to 20200419 
+	  //             ^^^1^^^^                      ^2^^^^^^2^^     ^^3^
+	  // ^1^: the first param for setFilter, match the name of 'id' for map.addLayer(...)
+	  // ^2^: 'date' is one of the properties in the .geojson
+	  // ^3^: 'dateAsNum' is read as var from parseInt(e...) 
+    
+	  // converting 2020.0307 to 3/17 format
+    var monthDigit = Math.floor( ( dateAsNum - 20200000 ) / 100);
+    var dayDigit   = ( dateAsNum - 20200000 ) / 30;   // should look for date parser lib   ++FIXME
 	  // update text in the UI
-	  document.getElementById('active-hour').innerText = hour12 + ampm;
+	  document.getElementById('active-date').innerText = monthDigit + "/" + dayDigit;
 	});
 
 	// next filter item by date, using the radius boxes UI.  see section of "Add interactivity" in tutorial
