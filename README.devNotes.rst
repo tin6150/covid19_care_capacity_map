@@ -1,18 +1,8 @@
 covid19_care_capacity_map
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Hospital bed capacity by state vs covid19 cases  
-May help present problem to those shrugging the COVID19 problem off?  \
-For now plan to display hospital bed and hospitalized patient count \
-Ideally also get ICU bed count and usage.
+Developer notes for the COVID-19 Hospital bed utilization (capacity) map.
 
-URL: https://tin6150.github.io/covid19_care_capacity_map/
-
-
-.. .md two tailing white spaces cannot cause a hard line break  
-.. nor can \ 
-.. i wondered about: \
- at the end, but that didnt work either
 
 
 DEV NOTES

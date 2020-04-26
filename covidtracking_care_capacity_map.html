@@ -134,8 +134,9 @@ p {
 
 /* debug box2 BL, cyain-ish, may need it bigger than 600 x 400 */
 #featuresDbg2 {
-    /*top: 110; */
+    /* top: 110; */
     /*margin-top: 20px; */
+    /*margin-left: 300px;*/
     height: 100px;   
     width:  600px;    
     font-family:"avenir next", Arial, sans-serif;
@@ -315,7 +316,7 @@ function cb4mouseMove_featuresDataBoxInfo(e) {
         if (states.length > 0) {
             text2display = 
                "Location: "         + states[0].properties.Location + "<BR>" 
-             + "Hosp Bed Util: "    + states[0].properties.BedUtil + "<BR>" 
+             + "Hosp Bed Util: "    + Math.round(states[0].properties.BedUtil) + "% <BR>" 
              + "Bed Per 1000 pop: " + states[0].properties.HospitalBedsPer1kPop + "<br>" 
              + "positive cases: "   + states[0].properties.positive + "<br>" 
              + "Hosp Icu cases: "   + states[0].properties.inIcuCurrently + "<BR>" 
@@ -353,11 +354,9 @@ function cb4mouseMove_dbgBoxInfo(e) {
 
 // this callback fn handle the date slider event
 function cb4event_dateSlider(e) {
-    	console.log("--trc--L344: inside slider parser cb4event_dateSlider(e)" );
 		var dateAsNum = parseInt(e.target.value);
-		// update the map
-		// so mapbox API still used to do the filtering... think of grep for data locally before render
-		//map.setFilter('collisions', ['==', ['number', ['get', 'Hour']], hour]);
+    	console.log("--trc--L344: inside slider parser cb4event_dateSlider(e).  dateAsNum read as: ", dateAsNum );
+		// so mapbox API still used to do the filtering... think of grep for data locally before render/update the map
 		map.setFilter('cap+case', ['==', ['number',['get','date']], dateAsNum ]);    // range 20200307 to 20200419 
 		//             ^^^1^^^^                      ^2^^^^^^2^^     ^^3^
 		// ^1^: the first param for setFilter, match the name of 'id' for map.addLayer(...)
@@ -365,18 +364,23 @@ function cb4event_dateSlider(e) {
 		// ^3^: 'dateAsNum' is read as var from parseInt(e...) 
 		
 		// converting 2020.0307 to 3/17 format
-		var monthDigit = Math.abs( dateAsNum ).toString().substring(4,6);
+		var monthDigit = Math.abs( dateAsNum ).toString().substring(4,6);   // 0th indexed, last position not included
 		var dayDigit   = Math.abs( dateAsNum ).toString().substring(6,8); 
 		//var dayDigit2  = Math.abs( dateAsNum ).toString();   // should look for date parser lib   ++FIXME
 		console.log("--dbg--L360: dateAsNum : ", dateAsNum );
 		console.log("--dbg--L360: monthDigit: ", monthDigit);
 		console.log("--dbg--L360: dayDigit  : ", dayDigit );
-		//var dayDigit   = Math.toString( dateAsNum ).substring(5,7) ;   // should look for date parser lib   ++FIXME
 		// update text in the UI
-		//document.getElementById('active-date').innerText = monthDigit + "/" + dayDigit;
 		document.getElementById('active-date').innerText = monthDigit + "/" + dayDigit;
-		console.log("--dbg--L373: setting DOM active-date as : ", dateAsNum );
-		//document.getElementById('active-date') = dataAsNum;
+		// below hack kinda work, but slider is jumpy.  good enough for POC  ++FIXME
+		if( parseInt(dayDigit) > 31 ) {
+			dateAsNum = "2020" + monthDigit.toString() + "31";     // need to worry about month with diff num of days ++FIXME 
+			console.log("--dbg--L373: setting DOM active-date as : ", dateAsNum );
+			document.getElementById('slider').value = dateAsNum;
+			dateAsNum = parseInt(e.target.value);
+			console.log("--dbg--L375:readback DOM active-date as : ", dateAsNum );
+			cb4event_dateSlider(e) ; // recursively call myself, should be only once, to update date field.
+		}
 
 }; // end cb4event_dateSlider(e)
 
