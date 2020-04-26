@@ -298,17 +298,12 @@ var map = new mapboxgl.Map({
 
 // this update the TL overlay data box named feature in the html div
 function cb4mouseMove_featuresDataBoxInfo(e) {
-        console.log( "--trc-- L319: inside cb4mouseMove_featuresDataBoxInfo(...)" );
+        //console.log( "--trc-- L319: inside cb4mouseMove_featuresDataBoxInfo(...)" );
         var states = map.queryRenderedFeatures(e.point, {
             //layers: ['egPropertySingle-x3']
-            //layers: ['capacity']
+            layers: ['cap+case']     // this has to match name in addLayer id
             //layers: ['states']
-            //layers: ['covid19']
-            layers: ['covid19-bedUtil']
-            //layers: ['delaware-tabblock2010-10-pophu-a0nmlv'] // this is 403 forbidden on 2020.0412
-            //layers: ['tabblock2010_10_pophu']
-            //layers: ['delaware']   // didn't work
-            //layers: ['statedata']  // from cholopleth tutorial, not sure what this name match to :/
+            //layers: ['covid19-bedUtil']
         });
         text2display = "no data yet";
         dbgText2display = "no data yet";
@@ -362,7 +357,7 @@ function cb4map_on_load__covidtracking() {
 
   console.log("--trc--L367: right before map.addLayer" )
 	map.addLayer({
-		id: 'covid19-bedUtil',        //formerly id: 'covidtracking',
+		id:   'cap+case',     // id: 'covid19-bedUtil',        //formerly id: 'covidtracking',
 		type: 'fill', // 'vector'
 		source: 'covid19-cap+case',
 		// https://docs.mapbox.com/mapbox-gl-js/style-spec/expressions/#interpolate
@@ -405,7 +400,7 @@ function cb4map_on_load__covidtracking() {
 	// trying to add filter for the data , toward end of tutorial in "Add interactivity"
 	//map.setFilter('collisions', ['==', ['number', ['get', 'Hour']], 12]);
   //            "filter": ['==', ['type',['get', 'key']],'value']
-	//map.setFilter('covid19-bedUtil', ['==', 'date', '20200419' ]);
+	map.setFilter('cap+case', ['==', 'date', '20200419' ]);    // range 0307 to 0419 
 	document.getElementById('slider').addEventListener('input', function(e) {
     console.log("--dbg--L413: inside slider parser" );
 	  var hour = parseInt(e.target.value);
@@ -470,9 +465,8 @@ map.addControl(new mapboxgl.FullscreenControl({container: document.querySelector
 // https://www.mapbox.com/mapbox-gl-js/api/#attributioncontrol
 map.addControl(new mapboxgl.AttributionControl({
         compact: false,  // set to false to add an EXTRA line with info below prefixed.  true add an (i) icon
-        customAttribution: '(cc) Tin Ho <A HREF="https://github.com/tin6150/covid19_care_capacity_map">App Info</A>'
+        customAttribution: '<A HREF="https://github.com/tin6150/covid19_care_capacity_map">(cc) Tin  App Info</A>'
 }));
-//map.style.sourceCaches['attribution-layer']._source.attribution =  '<A HREF="https://github.com/tin6150/covid19_care_capacity_map">Smelly</A>';
 
 
 console.log("--dbg--L547: the-end of script section, no more code, but likely exec early cuz of async nature and all the call backs!)" );
