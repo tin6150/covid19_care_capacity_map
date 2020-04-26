@@ -13,7 +13,8 @@
 StateGson=stateData.geojson
 StateAbbrFile=stateAbbr.csv
 CapacityFile=kff_capacity_dw_2020_0409.csv
-CaseFile=cases_daily_dw_2020_0419.json
+#CaseFile=cases_daily_dw_2020_0419.json
+CaseFile=cases_daily_automaton.json
 OutGson=state+capacity+cases.geojson  
 
 

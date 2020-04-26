@@ -86,7 +86,7 @@ p {
 /* this specify the size of the top right info box TR */
 #features {
     top: 0;
-    height: 190px;      /* formerly 190px */
+    height: 250px;      /* formerly 190px */
     margin-top: 10px;
     width: 250px;      /* formerly 250px */
 }
@@ -256,10 +256,10 @@ p {
 		</div>
 	</div>
 
- 	<!-- slider control UI -->
+ 	<!-- date slider control UI - need update for max date range-->
 	<div class='session' id='sliderbar'>
-	  <h2>Date: <label id='active-date'>4/19</label></h2>
-	  <input id='slider' class='row' type='range' min='20200307' max='20200419' step='1' value='20200419' />
+	  <h2>Date: <label id='active-date'>4/26</label></h2>
+	  <input id='slider' class='row' type='range' min='20200307' max='20200426' step='1' value='20200426' />
 	</div>
 	
 
@@ -317,11 +317,15 @@ function cb4mouseMove_featuresDataBoxInfo(e) {
             text2display = 
                "Location: "         + states[0].properties.Location + "<BR>" 
              + "Hosp Bed Util: "    + Math.round(states[0].properties.BedUtil) + "% <BR>" 
+             + "Current Hospt'zed:" + states[0].properties.hospitalizedCurrently + "<br>" 
+             + "Total Hosp Bed : "  + states[0].properties.TotalHospitalBeds + "<br>" 
              + "Bed Per 1000 pop: " + states[0].properties.HospitalBedsPer1kPop + "<br>" 
              + "positive cases: "   + states[0].properties.positive + "<br>" 
+             + "HospitilizedCumulative:"   + states[0].properties.hospitalizedCumulative + "<br>" 
              + "Hosp Icu cases: "   + states[0].properties.inIcuCurrently + "<BR>" 
              + "on Ventilator : "   + states[0].properties.onVentilatorCurrently + "<BR>" 
              + "Data date : "       + states[0].properties.date + "<BR>" 
+             + "Footnotes : "       + states[0].properties.footnotes + "<BR>" 
             //console.log( "--dbg-- L324: inside cb4mouseMove_featuresDataBoxInfo(...), text2display is", text2display );
 
             dbgText2display  = JSON.stringify(states);     //tmp dbg use

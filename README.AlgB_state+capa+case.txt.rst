@@ -75,7 +75,7 @@ meld  capa+abbr.ndjson  capa+abbr.remapped.ndjson
 
 **Step Bxx: cases to ndjson**
 wget https://covidtracking.com/api/v1/states/current.json -O cases_current_dw_2020_0419.json  # fewer entries, but diff struct.  daily(historical) dont have positiveScore, negativeScore, commercialScore, grade,
-wget https://covidtracking.com/api/v1/states/daily.json   -O cases_daily_dw_2020_0419.json    # use this *TODO: check this in?*
+wget https://covidtracking.com/api/v1/states/daily.json   -O cases_daily_dw_2020_0419.json    # use this *use this version*
 
         daily.json data for 1 entry:
         {"date":20200419,"state":"AK","positive":319,"negative":9576,"pending":null,"hospitalizedCurrently":37,"hospitalizedCumulative":36,"inIcuCurrently":null,"inIcuCumulative":null,"onVentilatorCurrently":null,"onVentilatorCumulative":null,"recovered":153,"hash":"a55d5f5198d699a8859e16fc9fa49cbecbc61939","dateChecked":"2020-04-19T20:00:00Z","death":9,"hospitalized":36,"total":9895,"totalTestResults":9895,"posNeg":9895,"fips":"02","deathIncrease":0,"hospitalizedIncrease":0,"negativeIncrease":235,"positiveIncrease":5,"totalTestResultsIncrease":240},
