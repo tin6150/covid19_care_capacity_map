@@ -221,6 +221,16 @@ p {
 <div id='console'>
   <h4>COVID19 Hospital bed utilization</h4>
   <p></p>
+  <!-- drop down picker selection UI -->
+  <!--<div class='dataClassPicker'> <!-- formerly 
+      -->
+  <div class='session'> 
+      <select id="dataClassSelectorUI">
+          <option value="Positive" >Positive cases</option> 
+          <option value="BedUtil"  >Hospital Bed Utilization</option> 
+          <option value="ICU" disabled >ICU cases</option> 
+      </select>
+  </div>
 
 	<!-- this is all that is needed to create a legend colorbar, no scripting req.
 		just html element!  well, actually, the css "row colors" is actually doing the color grading.    
@@ -243,17 +253,7 @@ p {
 	  <input id='slider' class='row' type='range' min='20200307' max='20200419' step='1' value='20200419' />
 	</div>
 	
-	<!-- drop down picker selection UI -->
-  <!--<div class='dataClassPicker'> <!-- formerly 
-      -->
-  <div class='session'> 
-      <select id="dataClassSelectorUI">
-          <option value="Positive" >Positive cases</option> 
-          <option value="BedUtil"  >Hospital Bed Utilization</option> 
-          <option value="ICU" disabled >ICU cases</option> 
-      </select>
-  </div>
-
+	
 </div>
 
 <script>
@@ -338,6 +338,49 @@ function cb4mouseMove_dbgBoxInfo(e) {
         document.getElementById('featuresDbg').innerHTML = JSON.stringify(features, null, 2);
 };  // end cb4mouseMove_dbgBoxInfo()
 
+
+// this callback fn handle the date slider event
+function cb4event_dateSlider(e) {
+    console.log("--trc--L344: inside slider parser cb4event_dateSlider(e)" );
+	  var dateAsNum = parseInt(e.target.value);
+	  // update the map
+	  // so mapbox API still used to do the filtering... think of grep for data locally before render
+	  //map.setFilter('collisions', ['==', ['number', ['get', 'Hour']], hour]);
+	  map.setFilter('cap+case', ['==', ['number',['get','date']], dateAsNum ]);    // range 20200307 to 20200419 
+	  //             ^^^1^^^^                      ^2^^^^^^2^^     ^^3^
+	  // ^1^: the first param for setFilter, match the name of 'id' for map.addLayer(...)
+	  // ^2^: 'date' is one of the properties in the .geojson
+	  // ^3^: 'dateAsNum' is read as var from parseInt(e...) 
+    
+	  // converting 2020.0307 to 3/17 format
+    var monthDigit = Math.floor( ( dateAsNum - 20200000 ) / 100);
+    var dayDigit   = ( dateAsNum - 20200000 ) / 30;   // should look for date parser lib   ++FIXME
+	  // update text in the UI
+	  document.getElementById('active-date').innerText = monthDigit + "/" + dayDigit;
+
+}; // end cb4event_dateSlider(e)
+
+function cb4event_dataClassSelectorUI(e) { 
+  console.log("--trc--L363: inside cb4event_dataClassSelectorUI(e)" );
+	// next filter item by date, using the radius boxes UI.  see section of "Add interactivity" in tutorial
+	// there is some bug in updating/querying hour vs day of week input 
+	// but that's a problem from the tutorial, i dont need to debug for this eg
+	// hopefully does not affect my covid19  map, but there may have to check the setFilter and mousemove events more carefully.
+	var day = e.target.value;
+	// update the map filter
+	if (day === 'all') {
+		filterDay = ['!=', ['string', ['get', 'Day']], 'placeholder'];
+	} else if (day === 'weekday') {
+		filterDay = ['match', ['get', 'Day'], ['Sat', 'Sun'], false, true];
+	} else if (day === 'weekend') {
+		filterDay = ['match', ['get', 'Day'], ['Sat', 'Sun'], true, false];
+	} else {
+		console.log('error');
+	}
+	map.setFilter('collisions', ['all', filterDay]);
+
+}; // end cb4event_dataClassSelectorUI(e) 
+
 // addLayer is where lot of changes from nyc map   ++FIXME++
 //map.on('load', function() {
 function cb4map_on_load__covidtracking() {
@@ -397,43 +440,12 @@ function cb4map_on_load__covidtracking() {
 	//map.setFilter('collisions', ['==', ['number', ['get', 'Hour']], 12]);
   //            "filter":   ['==', ['type',  ['get', 'key']],'value']
 	map.setFilter('cap+case', ['==', ['number',['get','date']], 20200419 ]);    // range 20200307 to 20200419 
-	document.getElementById('slider').addEventListener('input', function(e) {
-    console.log("--dbg--L413: inside slider parser" );
-	  var dateAsNum = parseInt(e.target.value);
-	  // update the map
-	  // so mapbox API still used to do the filtering... think of grep for data locally before render
-	  //map.setFilter('collisions', ['==', ['number', ['get', 'Hour']], hour]);
-	  map.setFilter('cap+case', ['==', ['number',['get','date']], dateAsNum ]);    // range 20200307 to 20200419 
-	  //             ^^^1^^^^                      ^2^^^^^^2^^     ^^3^
-	  // ^1^: the first param for setFilter, match the name of 'id' for map.addLayer(...)
-	  // ^2^: 'date' is one of the properties in the .geojson
-	  // ^3^: 'dateAsNum' is read as var from parseInt(e...) 
-    
-	  // converting 2020.0307 to 3/17 format
-    var monthDigit = Math.floor( ( dateAsNum - 20200000 ) / 100);
-    var dayDigit   = ( dateAsNum - 20200000 ) / 30;   // should look for date parser lib   ++FIXME
-	  // update text in the UI
-	  document.getElementById('active-date').innerText = monthDigit + "/" + dayDigit;
-	});
+	
+  
+  document.getElementById('slider').addEventListener('input', cb4event_dateSlider );
 
-	// next filter item by date, using the radius boxes UI.  see section of "Add interactivity" in tutorial
-	// there is some bug in updating/querying hour vs day of week input 
-	// but that's a problem from the tutorial, i dont need to debug for this eg
-	// hopefully does not affect my covid19  map, but there may have to check the setFilter and mousemove events more carefully.
-	document.getElementById('filters').addEventListener('change', function(e) {
-	var day = e.target.value;
-	// update the map filter
-	if (day === 'all') {
-		filterDay = ['!=', ['string', ['get', 'Day']], 'placeholder'];
-	} else if (day === 'weekday') {
-		filterDay = ['match', ['get', 'Day'], ['Sat', 'Sun'], false, true];
-	} else if (day === 'weekend') {
-		filterDay = ['match', ['get', 'Day'], ['Sat', 'Sun'], true, false];
-	} else {
-		console.log('error');
-	}
-	map.setFilter('collisions', ['all', filterDay]);
-	});
+  document.getElementById('dataClassSelectorUI').addEventListener('change', cb4event_dataClassSelectorUI );
+
 
 
   console.log("--trc--L456: right before map.on('mousemove', cb...) " );
