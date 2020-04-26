@@ -28,9 +28,6 @@
   <script src='https://api.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.js'></script>
   <link href='https://api.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.css' rel='stylesheet' />
 
-  <script src="https://d3js.org/d3.v4.min.js"></script><!-- for date slider in cb4event_dateSlider -->
-
-
   <style type="text/css">
 
 /* // # is not comment in css, probably cuz how html/url need to use # ...  */
@@ -66,7 +63,7 @@ p {
 	position: absolute;
 	top: 0;
 	bottom: 0;
-	width: 80%; /* should be 100 when not dbg */
+	width: 100%; /* should be 100 when not dbg */
 }
 
 
@@ -194,60 +191,6 @@ p {
   margin-bottom: 20px;
 }
 
-/************************************************************************/
-/* date slider via D3 */
-
-/* this specify the size of the top right info box TR */
-#d3dateSliderOverlay {
-	position: absolute ;
-    bottom: 0;
-    height: 60px;      /* formerly 190px */
-    width: 600px;      /* formerly 250px */
-    margin-bottom: 18px;
-  	background-color: pink;
-}
-
-d3DateSliderBody {
-      font-family:"avenir next", Arial, sans-serif;
-      font-size: 12px;
-      color: #696969;
-}
-
-.ticks {
-	font-size: 10px;
-}
-
-.track,
-.track-inset,
-.track-overlay {
-	stroke-linecap: round;
-}
-
-.track {
-	stroke: #000;
-	stroke-opacity: 0.3;
-	stroke-width: 10px;
-}
-
-.track-inset {
-	stroke: #ddd;
-	stroke-width: 8px;
-}
-
-.track-overlay {
-	pointer-events: stroke;
-	stroke-width: 50px;
-	stroke: transparent;
-	cursor: crosshair;
-}
-
-.handle {
-	fill: #fff;
-	stroke: #000;
-	stroke-opacity: 0.5;
-	stroke-width: 1.25px;
-}
-
 </style>
 </head>
 
@@ -279,11 +222,6 @@ d3DateSliderBody {
 
 <!-- nyc collision eg, top left user input "console" -->
 <div id='console'>
-
-  <!-- date slider via d3, mostly controlled by cb4event_dateSlider and a bunch of global *dateSlider* var , quite annoying with its placement req, cuz d3 just draw in a specific unexpected way-->
-  <!-- augh, this d3 is not usable, use absolute pixel drawing, dont resize according to scren :/ -->
-  <div class="d3DateSliderOverlay" id="d3slider">[-d3 dateSlider-]</div>
-
   <h4>COVID19 Hospital bed utilization</h4>
   <p></p>
   <!-- drop down picker selection UI -->
@@ -324,20 +262,6 @@ d3DateSliderBody {
 	
 
 <script>
-
-// slider for date, using S3 - ref: https://bl.ocks.org/officeofjane/b3f6a4f89a54fb193265b5c05659e17b
-// mostly used by cb4event_dateSlider()
-var formatDateIntoYear = d3.timeFormat("%Y");
-var formatDate = d3.timeFormat("%b %Y");
-var startDate = new Date("2020-03-07"),
-    endDate = new Date("2020-04-20");
-var dateSliderMargin;
-var dateSliderSvg;
-var dateSliderX;
-var d3dateSlider;
-var d3handle;
-var d3dateSliderLabel;
-// end of var declaration for d3 date slider
 
 // define access token
 //mapboxgl.accessToken = 'pk.eyJ1IjoiZXhhbXBsZXMiLCJhIjoiY2lqbmpqazdlMDBsdnRva284cWd3bm11byJ9.V6Hg2oYJwMAxeoR9GEzkAA'; // census choropleth tutorial
@@ -382,7 +306,7 @@ function cb4mouseMove_featuresDataBoxInfo(e) {
             //layers: ['states']
             //layers: ['covid19-bedUtil']
         });
-        text2display = "no data yet";
+        text2display = "";
         dbgText2display = "no data yet";
         dbgText2display = JSON.stringify(states);  //tmp dbg use
         dbg2Text2display = "no data yet";
@@ -421,79 +345,9 @@ function cb4mouseMove_dbgBoxInfo(e) {
 
 
 // xref: see ZWEDC_50x50sq_js line 218 for map.on('zoom') to change legend scale
+
 // this callback fn handle the date slider event
 function cb4event_dateSlider(e) {
-    console.log("--trc--L418: inside slider parser cb4event_dateSlider(e) [d3 version]" );
-
-	dateSliderMargin = {top:0, right:50, bottom:0, left:50},
-		width = 960 - dateSliderMargin.left - dateSliderMargin.right,
-		height = 100 - dateSliderMargin.top - dateSliderMargin.bottom;
-
-	dateSliderSvg = d3.select("#d3slider")
-		//.append("dateSliderSvg")
-		.append("svg")
-		.attr("width", width + dateSliderMargin.left + dateSliderMargin.right)
-		.attr("height", height);
-		
-	dateSliderX = d3.scaleTime()        // x is the user input for desired data date
-		.domain([startDate, endDate])
-		.range([0, width])
-		.clamp(true);
-
-	d3dateSlider = dateSliderSvg.append("g")
-		.attr("class", "d3slider")
-		.attr("transform", "translate(" + dateSliderMargin.left + "," + height / 2 + ")");
-
-	d3dateSlider.append("line")
-		.attr("class", "track")
-		.attr("x1", dateSliderX.range()[0])
-		.attr("x2", dateSliderX.range()[1])
-	.select(function() { return this.parentNode.appendChild(this.cloneNode(true)); })
-		.attr("class", "track-inset")
-	.select(function() { return this.parentNode.appendChild(this.cloneNode(true)); })
-		.attr("class", "track-overlay")
-		.call(d3.drag()
-			.on("start.interrupt", function() { d3dateSlider.interrupt(); })
-			.on("start drag", function() { cb_redrawDate(dateSliderX.invert(d3.event.x)); }));
-			//.on("start drag", function() { hue(x.invert(d3.event.x)); }));
-
-	d3dateSlider.insert("g", ".track-overlay")
-		.attr("class", "ticks")
-		.attr("transform", "translate(0," + 18 + ")")
-	.selectAll("text")
-		.data(dateSliderX.ticks(10))
-		.enter()
-		.append("text")
-		.attr("x", dateSliderX)
-		.attr("y", 10)
-		.attr("text-anchor", "middle")
-		.text(function(d) { return formatDateIntoYear(d); });
-
-	d3dateSliderLabel = d3dateSlider.append("text")  
-		.attr("class", "label")
-		.attr("text-anchor", "middle")
-		.text(formatDate(startDate))
-		.attr("transform", "translate(0," + (-25) + ")")
-	d3handle = d3dateSlider.insert("circle", ".track-overlay")
-		.attr("class", "handle")
-		.attr("r", 9);
-
-
-};  //end cb4event_dateSlider()
-
-
-function cb_redrawDate(h) {
-	console.log("--trc--L457: inside cb4_redrawDate" );
-	console.log("--dbg--L457: h param passed in is: ", h.toString() );
-	d3handle.attr("cx", dateSliderX(h));
-	d3dateSliderLabel
-		.attr("x", dateSliderX(h))
-		.text(formatDate(h));
-	dateSliderSvg.style("background-color", d3.hsl(h/1000000000, 0.8, 0.8));
-}; // end cb_redrawDate
-
-// this callback fn handle the date slider event
-function cb4event_dateSlider_obsolete(e) {
     	console.log("--trc--L344: inside slider parser cb4event_dateSlider(e)" );
 		var dateAsNum = parseInt(e.target.value);
 		// update the map
@@ -631,7 +485,7 @@ map.addControl(new mapboxgl.AttributionControl({
 }));
 
 // invoke this once to do initial draw of date slider and set proper start date
-cb4event_dateSlider(null);
+//cb4event_dateSlider(null);
 
 console.log("--dbg--L547: the-end of script section, no more code, but likely exec early cuz of async nature and all the call backs!)" );
 
