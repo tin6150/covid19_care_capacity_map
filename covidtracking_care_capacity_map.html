@@ -339,24 +339,31 @@ function cb4mouseMove_dbgBoxInfo(e) {
 };  // end cb4mouseMove_dbgBoxInfo()
 
 
+// xref: see ZWEDC_50x50sq_js line 218 for map.on('zoom') to change legend scale
 // this callback fn handle the date slider event
 function cb4event_dateSlider(e) {
     console.log("--trc--L344: inside slider parser cb4event_dateSlider(e)" );
-	  var dateAsNum = parseInt(e.target.value);
-	  // update the map
-	  // so mapbox API still used to do the filtering... think of grep for data locally before render
-	  //map.setFilter('collisions', ['==', ['number', ['get', 'Hour']], hour]);
-	  map.setFilter('cap+case', ['==', ['number',['get','date']], dateAsNum ]);    // range 20200307 to 20200419 
-	  //             ^^^1^^^^                      ^2^^^^^^2^^     ^^3^
-	  // ^1^: the first param for setFilter, match the name of 'id' for map.addLayer(...)
-	  // ^2^: 'date' is one of the properties in the .geojson
-	  // ^3^: 'dateAsNum' is read as var from parseInt(e...) 
-    
-	  // converting 2020.0307 to 3/17 format
-    var monthDigit = Math.floor( ( dateAsNum - 20200000 ) / 100);
-    var dayDigit   = ( dateAsNum - 20200000 ) / 30;   // should look for date parser lib   ++FIXME
-	  // update text in the UI
-	  document.getElementById('active-date').innerText = monthDigit + "/" + dayDigit;
+		var dateAsNum = parseInt(e.target.value);
+		// update the map
+		// so mapbox API still used to do the filtering... think of grep for data locally before render
+		//map.setFilter('collisions', ['==', ['number', ['get', 'Hour']], hour]);
+		map.setFilter('cap+case', ['==', ['number',['get','date']], dateAsNum ]);    // range 20200307 to 20200419 
+		//             ^^^1^^^^                      ^2^^^^^^2^^     ^^3^
+		// ^1^: the first param for setFilter, match the name of 'id' for map.addLayer(...)
+		// ^2^: 'date' is one of the properties in the .geojson
+		// ^3^: 'dateAsNum' is read as var from parseInt(e...) 
+		
+		// converting 2020.0307 to 3/17 format
+		var monthDigit = Math.abs( dateAsNum ).toString().substring(4,6);
+		var dayDigit   = Math.abs( dateAsNum ).toString().substring(6,8); 
+		//var dayDigit2  = Math.abs( dateAsNum ).toString();   // should look for date parser lib   ++FIXME
+		console.log("--dbg--L360: dateAsNum : ", dateAsNum );
+		console.log("--dbg--L360: monthDigit: ", monthDigit);
+		console.log("--dbg--L360: dayDigit  : ", dayDigit );
+		//var dayDigit   = Math.toString( dateAsNum ).substring(5,7) ;   // should look for date parser lib   ++FIXME
+		// update text in the UI
+		//document.getElementById('active-date').innerText = monthDigit + "/" + dayDigit;
+		document.getElementById('active-date').innerText = monthDigit + "/" + dayDigit;
 
 }; // end cb4event_dateSlider(e)
 
@@ -404,20 +411,21 @@ function cb4map_on_load__covidtracking() {
 			'fill-color': [
                 'interpolate',
                 ['linear'],
-                ['get', 'positive'],    //tmp use, no null here
-                //['get', 'BedUtil'],       // change field here
-// 9 classes, multi-hue from light yellow to dark red.  need to match legend drawn by html/css
-// https://colorbrewer2.org/?type=sequential&scheme=YlOrRd&n=9
-  0,  '#ffffcc',
-  1,  '#ffeda0',
-  5,  '#fed976',
- 10,  '#feb24c',
- 30,  '#fd8d3c',
- 50,  '#fc4e2a',
- 70,  '#e31a1c',
- 90,  '#bd0026',
-100,  '#800026'
-			],
+                //['get', 'positive'],    //tmp use, no null here
+                ['get', 'BedUtil'],       // change field here
+                // 9 classes, multi-hue from light yellow to dark red.  need to match legend drawn by html/css
+                // https://colorbrewer2.org/?type=sequential&scheme=YlOrRd&n=9
+                0,    '#ffffff',    // adding white, hopefully null falls in here
+                0.1,  '#ffffcc',
+                  1,  '#ffeda0',
+                  5,  '#fed976',
+                10,  '#feb24c',
+                30,  '#fd8d3c',
+                50,  '#fc4e2a',
+                70,  '#e31a1c',
+                90,  '#bd0026',
+                100,  '#800026'
+        	],
 		    //'fill-color': [ "curve", ["step"], ["number", ["get", "density"], 1], "#FFEDA0", 10, "#FED976", 20, "#FEB24C", 50, "#FD8D3C", 100, "#FC4E2A", 200, "#E31A1C", 500, "#BD0026", 2000, "#000000" ],
 		    // use a curve (http://bl.ocks.org/anandthakker/raw/6d0269825a7e0381cdcde13f84a0b6b0/#types-expression-curve)
 		    // of type "step," which will step through each break instead of interpolating between them.
@@ -425,14 +433,13 @@ function cb4map_on_load__covidtracking() {
 		    // Each step is then a pair [{color code}, {max value for break}]
 		    // Finally, add a default color code for any features that fall outside of the steps you've defined.
 		    //-"curve", ["step"], ["number", ["get", "density"], 1], "#FFEDA0", 10, "#FED976", 20, "#FEB24C", 50, "#FD8D3C", 100, "#FC4E2A", 200, "#E31A1C", 500, "#BD0026", 2000, "#000000"
-			'fill-opacity': 0.3
+			  'fill-opacity': 0.3
 		},
 		layout: {}
 
 	});  // end map.addLayer()
+	console.log("--trc--L434: after code for map.addLayer()" );
 
-
-  // xref: see ZWEDC_50x50sq_js line 218 for map.on('zoom') to change legend scale
 	
 	// filter option, first it was static, 
 	// then changed to depend on DOM input, see toward end of tutorial in "Add interactivity"
@@ -440,13 +447,9 @@ function cb4map_on_load__covidtracking() {
 	//map.setFilter('collisions', ['==', ['number', ['get', 'Hour']], 12]);
   //            "filter":   ['==', ['type',  ['get', 'key']],'value']
 	map.setFilter('cap+case', ['==', ['number',['get','date']], 20200419 ]);    // range 20200307 to 20200419 
-	
-  
   document.getElementById('slider').addEventListener('input', cb4event_dateSlider );
 
   document.getElementById('dataClassSelectorUI').addEventListener('change', cb4event_dataClassSelectorUI );
-
-
 
   console.log("--trc--L456: right before map.on('mousemove', cb...) " );
 	map.on('mousemove', cb4mouseMove_dbgBoxInfo);
