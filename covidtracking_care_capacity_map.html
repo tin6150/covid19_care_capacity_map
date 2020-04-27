@@ -199,11 +199,8 @@ p {
 </style>
 </head>
 
-
 <!--
 -->
-
-
 
 <body>
 
@@ -230,8 +227,6 @@ p {
   <h4>COVID19 Hospital bed utilization</h4>
   <p></p>
   <!-- drop down picker selection UI -->
-  <!--<div class='dataClassPicker'> <!-- formerly 
-      -->
   <div class='session'> 
       <select id="dataClassSelectorUI">
           <option value="Positive" disabled >Positive cases</option> 
@@ -256,9 +251,9 @@ p {
 		</div>
 	</div>
 
- 	<!-- date slider control UI - need update for max date range-->
+	<!-- date slider control UI - need update for max date range-->
 	<div class='session' id='sliderbar'>
-	  <h2>Date: <label id='active-date'>4/26</label></h2>
+		<h2>Date: <label id='active-date'>4/26</label></h2>  <!-- TODO: update when got new data -->
 	  <input id='slider' class='row' type='range' min='20200307' max='20200426' step='1' value='20200426' />
 	</div>
 	
@@ -268,6 +263,10 @@ p {
 	
 
 <script>
+
+// ++TODO: update when got new data
+var latestAvailDataDate = 20200426;
+document.getElementById('slider').value = latestAvailDataDate;   // also used later by initial data filter inside map.on('load'...)
 
 // define access token
 //mapboxgl.accessToken = 'pk.eyJ1IjoiZXhhbXBsZXMiLCJhIjoiY2lqbmpqazdlMDBsdnRva284cWd3bm11byJ9.V6Hg2oYJwMAxeoR9GEzkAA'; // census choropleth tutorial
@@ -359,7 +358,7 @@ function cb4mouseMove_dbgBoxInfo(e) {
 // this callback fn handle the date slider event
 function cb4event_dateSlider(e) {
 		var dateAsNum = parseInt(e.target.value);
-    	console.log("--trc--L344: inside slider parser cb4event_dateSlider(e).  dateAsNum read as: ", dateAsNum );
+		console.log("--trc--L344: inside slider parser cb4event_dateSlider(e).  dateAsNum read as: ", dateAsNum );
 		// so mapbox API still used to do the filtering... think of grep for data locally before render/update the map
 		map.setFilter('cap+case', ['==', ['number',['get','date']], dateAsNum ]);    // range 20200307 to 20200419 
 		//             ^^^1^^^^                      ^2^^^^^^2^^     ^^3^
@@ -385,6 +384,7 @@ function cb4event_dateSlider(e) {
 			console.log("--dbg--L375:readback DOM active-date as : ", dateAsNum );
 			cb4event_dateSlider(e) ; // recursively call myself, should be only once, to update date field.
 		}
+		cb4mouseMove_featuresDataBoxInfo(e) ; // call to update TL feature display overlay box
 
 }; // end cb4event_dateSlider(e)
 
@@ -415,7 +415,7 @@ function cb4event_dataClassSelectorUI(e) {
 //map.on('load', function() {
 function cb4map_on_load__covidtracking() {
 	console.log("--trc--L240: in cb4map_on_load__covidtracking()" );
-    map.fitBounds([[-133.2421875, 16.972741], [-47.63671875, 52.696361]]);  // continental US and some, but no Hawaii or Alaska
+	map.fitBounds([[-133.2421875, 16.972741], [-47.63671875, 52.696361]]);  // continental US and some, but no Hawaii or Alaska
 	map.getCanvas().style.cursor = 'default';
 	// https://stackoverflow.com/questions/51166886/how-to-fill-color-for-a-region-based-on-value-in-mapbox
 	// caair.html
@@ -425,7 +425,7 @@ function cb4map_on_load__covidtracking() {
 		'data': './state+capacity+cases.geojson'
 	})
 
-  console.log("--trc--L367: right before map.addLayer" )
+	console.log("--trc--L367: right before map.addLayer" )
 	map.addLayer({
 		id:   'cap+case',     // id: 'covid19-bedUtil',        //formerly id: 'covidtracking',
 		type: 'fill', // 'vector'
@@ -465,12 +465,10 @@ function cb4map_on_load__covidtracking() {
 	console.log("--trc--L434: after code for map.addLayer()" );
 
 	
-	// filter option, first it was static, 
-	// then changed to depend on DOM input, see toward end of tutorial in "Add interactivity"
-	// trying to add filter for the data , toward end of tutorial in "Add interactivity"
-	//map.setFilter('collisions', ['==', ['number', ['get', 'Hour']], 12]);
-    //            "filter":   ['==', ['type',  ['get', 'key']],'value']
-	map.setFilter('cap+case', ['==', ['number',['get','date']], 20200419 ]);    // range 20200307 to 20200419 
+	// need to start with an inital filter date for the data
+	//            "filter":   ['==', ['type',  ['get', 'key']],'value']
+	//map.setFilter('cap+case', ['==', ['number',['get','date']], 20200419 ]);    // range 20200307 to 20200419 
+	map.setFilter('cap+case', ['==', ['number',['get','date']], latestAvailDataDate ]);    // range 20200307 to 20200419 
 	document.getElementById('slider').addEventListener('input', cb4event_dateSlider );
 
 	document.getElementById('dataClassSelectorUI').addEventListener('change', cb4event_dataClassSelectorUI );
@@ -503,7 +501,7 @@ map.addControl(new mapboxgl.AttributionControl({
 }));
 
 // invoke this once to do initial draw of date slider and set proper start date
-//cb4event_dateSlider(null);
+//cb4event_dateSlider();  // cant call this, need a param, and it cant be null
 
 console.log("--dbg--L547: the-end of script section, no more code, but likely exec early cuz of async nature and all the call backs!)" );
 
