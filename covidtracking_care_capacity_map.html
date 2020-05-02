@@ -496,14 +496,15 @@ console.log("--dbg--L545: right before map.on('load',cb4map_on_load__covid)" );
 map.on('load', cb4map_on_load__covidtracking)  // UI input was in this callback fn  
 console.log("--dbg--L546: right after map.on('load',cb4map_on_load__covid)" );
 
-map.addControl( new mapboxgl.NavigationControl(), 'bottom-right');  
+// these navigation control in bottom-right would make attribution bar float up on phone screen portrait mode, no good! :/
+map.addControl( new mapboxgl.NavigationControl(), 'bottom-left');  
 //map.addControl( new mapboxgl.FullscreenControl({container: document.querySelector('body')}));
-map.addControl( new mapboxgl.FullscreenControl(), 'bottom-right');  
+map.addControl( new mapboxgl.FullscreenControl(), 'bottom-left');  
 
 // https://www.mapbox.com/mapbox-gl-js/api/#attributioncontrol
 map.addControl(new mapboxgl.AttributionControl({
         compact: false,  // set to false to add an EXTRA line with info below prefixed.  true add an (i) icon
-        customAttribution: '<A HREF="https://github.com/tin6150/covid19_care_capacity_map">(cc) Tin  App Info</A>'
+        customAttribution: '<A HREF="https://github.com/tin6150/covid19_care_capacity_map">(cc) Tin Ho. App Info</A>'
 }));
 
 // invoke this once to do initial draw of date slider and set proper start date
