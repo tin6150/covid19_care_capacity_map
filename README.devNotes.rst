@@ -206,7 +206,8 @@ Dev Env
 
 To avoid CORS error (since html need to load a .geojson), run a simple web server from the directory containing the files of the project ::
 
-        python -m SimpleHTTPServer 8000
+        python  -m SimpleHTTPServer 8000  # If Python version returned above is 2.X
+	python3 -m http.server      8000  # If Python version returned above is 3.X
 
 Then on browser, navigate to http://localhost:8000 
 

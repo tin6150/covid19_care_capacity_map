@@ -1,4 +1,6 @@
 node_modules/
+DATA_PREP/ 
+
 package-lock.json
 # ^^ i did npm install for some tools, but they are not really needed for this repo, just tool i use.
 #
