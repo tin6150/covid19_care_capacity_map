@@ -40,7 +40,6 @@ body {
 }
 
 h2, h3 {
-    margin: 10px;
     font-size: 1.2em;
 }
 
@@ -51,7 +50,7 @@ h3 {
 
 p {
     font-size: 0.85em;
-    margin: 10px;
+    /*margin: 10px;*/
     text-align: left;
 }
 
@@ -80,16 +79,17 @@ p {
 	background: rgba(250, 250, 250, 0.8);  /* 255 255 255 is pure white */
 	margin-right: 4px; /* choropleth used 20px */
 	font-family: Arial, sans-serif;
-    font-size: 0.8em;
+    font-size: 0.75em;
 	overflow: auto;
 	border-radius: 3px;
+    z-index: 20;  /* want this in front of the tr legend which i set to z-index:10 */
 }
 /* this specify the size of the top right info box TR */
 #features {
     top: 0;
-    height: 190px;      /* formerly 190px */
+    height: 200px;      /* formerly 190px */
     margin-top: 2px;
-    width: 220px;      /* formerly 250px */
+    width: 190px;      /* formerly 250px */
 }
 
 
@@ -155,7 +155,7 @@ p {
   //padding: 6px 12px;
   background-color: white;
   visibility: visible;
-  z-index: -2;  /* want this behind the legend at tr */
+  z-index: 10;  /* map should be at z-index 0.  want this behind the legend at tr */
 }
 
 /** legend is from the nyc collision example, mostly fitted INSIDE TL "console"  **/
@@ -496,8 +496,9 @@ console.log("--dbg--L545: right before map.on('load',cb4map_on_load__covid)" );
 map.on('load', cb4map_on_load__covidtracking)  // UI input was in this callback fn  
 console.log("--dbg--L546: right after map.on('load',cb4map_on_load__covid)" );
 
-map.addControl( new mapboxgl.NavigationControl(), 'top-right');  
-map.addControl(new mapboxgl.FullscreenControl({container: document.querySelector('body')}));
+map.addControl( new mapboxgl.NavigationControl(), 'bottom-right');  
+//map.addControl( new mapboxgl.FullscreenControl({container: document.querySelector('body')}));
+map.addControl( new mapboxgl.FullscreenControl(), 'bottom-right');  
 
 // https://www.mapbox.com/mapbox-gl-js/api/#attributioncontrol
 map.addControl(new mapboxgl.AttributionControl({
