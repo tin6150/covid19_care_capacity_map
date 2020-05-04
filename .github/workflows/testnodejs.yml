@@ -1,13 +1,18 @@
 # This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 
-name: Node.js CI
+name: Node.js CI invoke bash script to fetch new data and crate gson
 
+# cron is min hour  day month  week 
 on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+  schedule:
+    - cron: "47 4  4 5  1"
+  #release:
+  #  types: [created]
+  #push:
+  #  branches: [ master ]
+  #pull_request:
+  #  branches: [ master ]
 
 jobs:
   build:
@@ -16,7 +21,8 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [10.x, 12.x]
+        #node-version: [10.x, 12.x]
+        node-version: 12.x
 
     steps:
     - uses: actions/checkout@v2
@@ -34,5 +40,6 @@ jobs:
     #- run: npm test
     - run: pwd
     - run: ls -lah
+    - run: bash -x ./fetchNewCaseDataFile.sh && bash -x ./AlgC_state+capa+case+calc.sh
     - run: git status
       
