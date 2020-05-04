@@ -7,6 +7,7 @@ name: Fetch new data from covidtracking and generate new gson
 
 
 # 11:55 pm EST is 3:55 am UTC
+# 03:10 am EST is 7:10 am UTC
 # cron is min hour  day month  week 
 on:
   schedule:
@@ -55,4 +56,5 @@ jobs:
     - run: git config --global user.name    "sn_github_action" 
     - run: git config --global github.user  "sn_github_action" 
     - run: export DATE=$(date) && git commit -a -m "[github action] new state+capacity+cases.geojson created on $DATE"
+    - run: git push
      
