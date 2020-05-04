@@ -1,12 +1,17 @@
 # This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+# github action based on Node.js CI 
+# Tin 2020.0504
 
-name: Node.js CI invoke bash script to fetch new data and crate gson
+name: Fetch new data from covidtracking and generate new gson 
 
+
+# 11:55 pm EST is 3:55 am UTC
 # cron is min hour  day month  week 
 on:
   schedule:
-    - cron: "47 4  4 5  1"
+    - cron: "58 4  4 5  1"
+      #- cron: "55 3  * *  *" 
   #release:
   #  types: [created]
   #push:
@@ -22,7 +27,7 @@ jobs:
     strategy:
       matrix:
         #node-version: [10.x, 12.x]
-        node-version: 12.x
+        node-version: [12.x]
 
     steps:
     - uses: actions/checkout@v2
