@@ -505,12 +505,12 @@ console.log("--dbg--L545: right before map.on('load',cb4map_on_load__covid)" );
 map.on('load', cb4map_on_load__covidtracking)  // UI input was in this callback fn  
 console.log("--dbg--L546: right after map.on('load',cb4map_on_load__covid)" );
 //map.on('load', cb4event_dateSlider)   //NaN 
-map.on('load', function(e) {
+document.addEventListener('DOMContentLoaded', function() {
 	console.log("--dbg--L:V09: inside a second map.on('load'...)" );
 	//document.addEventListener('DOMContentLoaded', cb4event_dateSlider)   //  chained event better?
-	document.addEventListener('DOMContentLoaded', function(event) {
+	map.on('load', function() {
 		console.log("--dbg--L:V09a: inside a cb in second map.on('load'...)" );
-		cb4event_dateSlider(event);
+		cb4event_dateSlider;
 		console.log("--dbg--L:V09b: after line for cb in second map.on('load'...)" );
 	})   //  chained event better?
 	console.log("--dbg--L:V10: at end of second map.on('load'...)" );
