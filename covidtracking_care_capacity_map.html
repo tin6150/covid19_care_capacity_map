@@ -257,9 +257,21 @@ p {
 
 	<!-- date slider control UI - need update for max date range-->
 	<div class='session' id='sliderbar'>
-		<h2>Date: <label id='active-date'>4/26</label></h2>  <!-- TODO: update when got new data -->
-      <!--  ++TODO: update when got new data -->
-	  <input id='slider' class='row' type='range' min='20200307' max='20200501' step='1' value='20200501' />
+		<h2>Date: <label id='active-date'>5/1</label></h2>  <!-- TODO: update when got new data -->
+		<!--  ++TODO: update when got new data -->
+
+		<!-- old simple YYYYmmDD form, jumpy 
+		<input id='slider' class='row' type='range' min='20200307' max='20200501' step='1' value='20200501' />
+		<input id='slider' class='row' type="range" step="86400000" max="1325289600000" min="1293840000000" value="1293840000000" />
+		-->
+		<!-- new JS date object based, internal is millisec since unix epoch 1970-01-01 (GMT)
+1583568000000 from JS console.log(Date.parse('2020-03-07 PST' ) );
+1588579200000 from JS console.log(Date.parse('2020-05-04 PST') );
+1588320000000 from JS Date.parse('2020-05-01 PST') 
+		-->
+		<input id='slider' class='row' type="range" step="86400000" min="1583568000000" max="1588579200000" value="1588320000000 " />  
+		<!-- Date.parse('2020-05-01 PST') 1588320000000 msec since unix epoch 1970-01-01 -->
+
 	</div>
 	
 
@@ -271,7 +283,7 @@ p {
 
 // ++TODO: update when got new data
 var latestAvailDataDate = 20200501;
-document.getElementById('slider').value = latestAvailDataDate;   // also used later by initial data filter inside map.on('load'...)
+//document.getElementById('slider').value = latestAvailDataDate;   // also used later by initial data filter inside map.on('load'...)
 
 // define access token
 //mapboxgl.accessToken = 'pk.eyJ1IjoiZXhhbXBsZXMiLCJhIjoiY2lqbmpqazdlMDBsdnRva284cWd3bm11byJ9.V6Hg2oYJwMAxeoR9GEzkAA'; // census choropleth tutorial
@@ -350,7 +362,6 @@ function cb4mouseMove_dbgBoxInfo(e) {
             layers: ['egPropertySingle-x3']
             //layers: ['delaware-tabblock2010-10-pophu-a0nmlv'] // this is 403 forbidden on 2020.0412
             //layers: ['tabblock2010_10_pophu']
-            //layers: ['delaware']   // didn't work
             //layers: ['statedata']  // from cholopleth tutorial, not sure what this name match to :/
         });
         var features = map.queryRenderedFeatures(e.point);
@@ -362,33 +373,29 @@ function cb4mouseMove_dbgBoxInfo(e) {
 
 // this callback fn handle the date slider event
 function cb4event_dateSlider(e) {
-		var dateAsNum = parseInt(e.target.value);
-		console.log("--trc--L344: inside slider parser cb4event_dateSlider(e).  dateAsNum read as: ", dateAsNum );
+		var dateInMsec = parseInt(e.target.value); // input msec since unix epoch eg 1588320000000 for 2020-05-01 
+		var jsDate = new Date( dateInMsec ); 
+
+		console.log("--trc--L344: inside slider parser cb4event_dateSlider(e).  dateInMsec read as: ", dateInMsec );
+		var dateMM = (jsDate.getMonth() + 1).toString().padStart(2,'0'); // 0-index, Jan is 0
+		var dateDD = jsDate.getDate().toString().padStart(2,'0');
+		//var dateYYYY = jsDate.getFullYear(); 
+		//var dateMM   = dateInMsec.toLocaleString("en-US", {month: "long"}) // December
+		//var dateDD   = jsDate.toLocaleString("en-US", {day: "numeric"}) // 5
+		var dateYYYY = jsDate.toLocaleString("en-US", {year: "numeric"}) // 2020
+		var dateYYYYMMDD = dateYYYY + dateMM + dateDD ; // "20200501"
+		var dateAsNum = parseInt(dateYYYYMMDD);
+		console.log("--trc--L346: inside slider parser cb4event_dateSlider(e).  dateAsNum set to: ", dateAsNum );
+
 		// so mapbox API still used to do the filtering... think of grep for data locally before render/update the map
-		map.setFilter('cap+case', ['==', ['number',['get','date']], dateAsNum ]);    // range 20200307 to 20200419 
+		map.setFilter('cap+case', ['==', ['number',['get','date']], dateAsNum ]);    // approx expected range 20200307 to 20200419 
 		//             ^^^1^^^^                      ^2^^^^^^2^^     ^^3^
 		// ^1^: the first param for setFilter, match the name of 'id' for map.addLayer(...)
 		// ^2^: 'date' is one of the properties in the .geojson
 		// ^3^: 'dateAsNum' is read as var from parseInt(e...) 
 		
-		// converting 2020.0307 to 3/17 format
-		var monthDigit = Math.abs( dateAsNum ).toString().substring(4,6);   // 0th indexed, last position not included
-		var dayDigit   = Math.abs( dateAsNum ).toString().substring(6,8); 
-		//var dayDigit2  = Math.abs( dateAsNum ).toString();   // should look for date parser lib   ++FIXME
-		console.log("--dbg--L360: dateAsNum : ", dateAsNum );
-		console.log("--dbg--L360: monthDigit: ", monthDigit);
-		console.log("--dbg--L360: dayDigit  : ", dayDigit );
 		// update text in the UI
-		document.getElementById('active-date').innerText = monthDigit + "/" + dayDigit;
-		// below hack kinda work, but slider is jumpy.  good enough for POC  ++FIXME
-		if( parseInt(dayDigit) > 31 ) {
-			dateAsNum = "2020" + monthDigit.toString() + "31";     // need to worry about month with diff num of days ++FIXME 
-			console.log("--dbg--L373: setting DOM active-date as : ", dateAsNum );
-			document.getElementById('slider').value = dateAsNum;
-			dateAsNum = parseInt(e.target.value);
-			console.log("--dbg--L375:readback DOM active-date as : ", dateAsNum );
-			cb4event_dateSlider(e) ; // recursively call myself, should be only once, to update date field.
-		}
+		document.getElementById('active-date').innerText = dateMM + "/" + dateDD;
 		cb4mouseMove_featuresDataBoxInfo(e) ; // call to update TL feature display overlay box
 
 }; // end cb4event_dateSlider(e)
