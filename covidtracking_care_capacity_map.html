@@ -41,10 +41,11 @@ body {
 
 h2, h3 {
     font-size: 1.2em;
+	font-weight: bold;	
 }
 
 h3 {
-    font-size: 1em;
+    font-size: 1.1em;
 }
 
 
@@ -213,15 +214,11 @@ p {
 </style>
 </head>
 
-<!--
--->
-
 <body>
 
 <div id='map'></div>
 
-
-<!-- this create the top right info box -->
+<!-- this create the top right TR info box -->
 <div class='map-overlay' id='features'>
 	<h2>Utilization Detail:</h2> <!-- this is title of top right box -->
 	<div id='pd'><p>Hover to show capacity data.</p></div>   <!-- static text, replaced later by JS -->
@@ -269,7 +266,7 @@ p {
 	<!-- date slider control UI - need update for max date range-->
 	<div class='session' id='sliderbar'>
 		<h2>Date: <label id='active-date'>5/1</label></h2>  <!-- TODO: update when got new data -->
-		<!--  ++TODO: update above when got new data -->
+		<!--  ++TODO: update active-date id (above) and showDataDate (further down) when got new data -->
 
 		<!-- new JS date object based, internal is millisec since unix epoch 1970-01-01 (GMT)
 1583568000000 from JS console.log(Date.parse('2020-03-07 PST' ) );
@@ -277,7 +274,7 @@ p {
 1588320000000 from JS Date.parse('2020-05-01 PST') 
 1588406400000 2020-05-02 PST
 		-->
-		<input id='slider' class='row4slider' type="range" step="86400000" min="1583568000000" max="1588579200000" value="1588320000000 " />  
+		<input id='slider' class='row4slider' type="range" step="86400000" min="1583568000000" max="1588579200000" value="1588320000000" />  
 	</div>
 	
 
@@ -287,7 +284,7 @@ p {
 
 <script>
 
-var showDataDate = 20200501;  // number, not string, // ++TODO: update when got new data
+var showDataDate = 20200501;  // number, not string, // ++TODO: update when got new data, also active-date id HTML higher up
 //document.querySelector('#slider').max = 1588406400000 ;   // 2020-05-02 PST
 document.querySelector('#slider').max = new Date() - (86400000*1);  // set max to today - 1 day, would need automated daily data upload.
 // HTML DOM #name is for id=name ??  .name is for class=name ?? 
@@ -406,24 +403,7 @@ function cb4event_dateSlider(e) {
 function cb4event_dataClassSelectorUI(e) { 
 	console.log("--trc--L363: inside cb4event_dataClassSelectorUI(e)" );
 	// need to eventually respond to change to IcuUtil, Ventilator Utilization, etc
-	// code below is dummy left over from nyc collision 
-	// next filter item by date, using the radius boxes UI.  see section of "Add interactivity" in tutorial
-	// there is some bug in updating/querying hour vs day of week input 
-	// but that's a problem from the tutorial, i dont need to debug for this eg
-	// hopefully does not affect my covid19  map, but there may have to check the setFilter and mousemove events more carefully.
 	var day = e.target.value;
-	// update the map filter
-	if (day === 'all') {
-		filterDay = ['!=', ['string', ['get', 'Day']], 'placeholder'];
-	} else if (day === 'weekday') {
-		filterDay = ['match', ['get', 'Day'], ['Sat', 'Sun'], false, true];
-	} else if (day === 'weekend') {
-		filterDay = ['match', ['get', 'Day'], ['Sat', 'Sun'], true, false];
-	} else {
-		console.log('error');
-	}
-	map.setFilter('collisions', ['all', filterDay]);
-
 }; // end cb4event_dataClassSelectorUI(e) 
 
 // addLayer is where lot of changes from nyc map   ++FIXME++
@@ -504,17 +484,6 @@ function cb4map_on_load__covidtracking() {
 console.log("--dbg--L545: right before map.on('load',cb4map_on_load__covid)" );
 map.on('load', cb4map_on_load__covidtracking)  // UI input was in this callback fn  
 console.log("--dbg--L546: right after map.on('load',cb4map_on_load__covid)" );
-//map.on('load', cb4event_dateSlider)   //NaN 
-document.addEventListener('DOMContentLoaded', function() {
-	console.log("--dbg--L:V09: inside a second map.on('load'...)" );
-	//document.addEventListener('DOMContentLoaded', cb4event_dateSlider)   //  chained event better?
-	map.on('load', function() {
-		console.log("--dbg--L:V09a: inside a cb in second map.on('load'...)" );
-		cb4event_dateSlider;
-		console.log("--dbg--L:V09b: after line for cb in second map.on('load'...)" );
-	})   //  chained event better?
-	console.log("--dbg--L:V10: at end of second map.on('load'...)" );
-});
 
 // these navigation control in bottom-right would make attribution bar float up on phone screen portrait mode, no good! :/
 map.addControl( new mapboxgl.NavigationControl(), 'bottom-left');  
@@ -527,8 +496,7 @@ map.addControl(new mapboxgl.AttributionControl({
         customAttribution: '<A HREF="https://github.com/tin6150/covid19_care_capacity_map">(cc) Tin Ho. App Info</A>'
 }));
 
-// invoke this once to do initial draw of date slider and set proper start date
-//cb4event_dateSlider();  // cant call this, need a param, and it cant be null
+// wanted to invoke this once to do initial draw of date slider and set proper start date, but dont work
 cb4event_dateSlider;      // at least this doesnt error out, but dont seems executed
 
 console.log("--dbg--L547: the-end of script section, no more code, but likely exec early cuz of async nature and all the call backs!)" );
