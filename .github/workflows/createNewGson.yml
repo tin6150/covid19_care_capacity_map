@@ -2,18 +2,21 @@
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 # github action based on Node.js CI 
 # Tin 2020.0504
+# this thing works! :D
 
 name: Fetch new data from covidtracking and generate new gson 
 
 
+#  8:38 pm EST is 0:38 am UTC
 # 11:55 pm EST is 3:55 am UTC
 # 03:10 am EST is 7:10 am UTC
 # cron is min hour  day month  week 
 on:
   schedule:
-    - cron: "10 7  * *  *"
-      #- cron: "15 6  4 5  1"
-      #- cron: "55 3  * *  *" 
+    - cron:  "38 0  * *  *" 
+    #- cron: "55 3  * *  *" 
+    #- cron: "10 7  * *  *"
+    #- cron: "15 6  4 5  1"
   #release:
   #  types: [created]
   #push:
@@ -46,7 +49,7 @@ jobs:
     #- run: npm run build --if-present
     #- run: npm test
     - run: sudo apt install dos2unix
-    - run: which csv2json
+    #- run: which csv2json
     - run: pwd
     - run: ls -lah
     - run: bash -x ./fetchNewCaseDataFile.sh && bash -x ./AlgC_state+capa+case+calc.sh
