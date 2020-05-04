@@ -6,7 +6,7 @@ name: Hello World from Upload Python Package
 # cron is min hour  day month  week 
 on:
   schedule:
-    - cron: "45 2 4 5 1"
+    - cron: "39 4  4 5  1"
   #release:
   #  types: [created]
 
@@ -32,10 +32,12 @@ jobs:
         #TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
         #TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
       run: |
-        python setup.py sdist bdist_wheel
+        #python setup.py sdist bdist_wheel
         echo "hello world"
         ls -la
         hostname
         date
         df -hl
+        pwd
+        git status
         #twine upload dist/*
