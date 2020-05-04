@@ -182,12 +182,23 @@ p {
 .colors {
   /*background: linear-gradient(to right, #2dc4b2, #3bb3c3, #669ec4, #8b88b6, #a2719b, #aa5e79); nyc scale*/
   background: linear-gradient(to right, #ffffff, #ffffcc,#ffeda0,#fed976,#feb24c,#fd8d3c,#fc4e2a,#e31a1c,#bd0026,#800026 );    /*covid19*/
-  margin-bottom: 5px;
+  margin-top:    0.1em; 
+  margin-bottom: 0.1em; 
 }
 /** row to force the colorbar to be in a narrow height of 12 pixels **/
 .row {
-  height: 10px;
-  width: 100%;
+  /*height: 8px; */
+  height: 0.8em;
+  width: 96%;
+}
+
+.row4slider {
+  height: 0.6em; /*10px;*/
+  width: 96%;
+  position: relative;
+  margin-left: 0 auto;
+  text-align: center;
+  float: center; 
 }
 /** the label css is for the text legend below the colorbar to be horizontal (def to vertical) **/
 .label {
@@ -196,7 +207,7 @@ p {
   text-align: center;
 }
 .session {
-  margin-bottom: 20px;
+  margin-bottom: 0.2em; /*20px*/
 }
 
 </style>
@@ -258,20 +269,15 @@ p {
 	<!-- date slider control UI - need update for max date range-->
 	<div class='session' id='sliderbar'>
 		<h2>Date: <label id='active-date'>5/1</label></h2>  <!-- TODO: update when got new data -->
-		<!--  ++TODO: update when got new data -->
+		<!--  ++TODO: update above when got new data -->
 
-		<!-- old simple YYYYmmDD form, jumpy 
-		<input id='slider' class='row' type='range' min='20200307' max='20200501' step='1' value='20200501' />
-		<input id='slider' class='row' type="range" step="86400000" max="1325289600000" min="1293840000000" value="1293840000000" />
-		-->
 		<!-- new JS date object based, internal is millisec since unix epoch 1970-01-01 (GMT)
 1583568000000 from JS console.log(Date.parse('2020-03-07 PST' ) );
 1588579200000 from JS console.log(Date.parse('2020-05-04 PST') );
 1588320000000 from JS Date.parse('2020-05-01 PST') 
+1588406400000 2020-05-02 PST
 		-->
-		<input id='slider' class='row' type="range" step="86400000" min="1583568000000" max="1588579200000" value="1588320000000 " />  
-		<!-- Date.parse('2020-05-01 PST') 1588320000000 msec since unix epoch 1970-01-01 -->
-
+		<input id='slider' class='row4slider' type="range" step="86400000" min="1583568000000" max="1588579200000" value="1588320000000 " />  
 	</div>
 	
 
@@ -281,9 +287,10 @@ p {
 
 <script>
 
-// ++TODO: update when got new data
-var latestAvailDataDate = 20200501;
-//document.getElementById('slider').value = latestAvailDataDate;   // also used later by initial data filter inside map.on('load'...)
+var showDataDate = 20200501;  // number, not string, // ++TODO: update when got new data
+//document.querySelector('#slider').max = 1588406400000 ;   // 2020-05-02 PST
+document.querySelector('#slider').max = new Date() - (86400000*1);  // set max to today - 1 day, would need automated daily data upload.
+// HTML DOM #name is for id=name ??  .name is for class=name ?? 
 
 // define access token
 //mapboxgl.accessToken = 'pk.eyJ1IjoiZXhhbXBsZXMiLCJhIjoiY2lqbmpqazdlMDBsdnRva284cWd3bm11byJ9.V6Hg2oYJwMAxeoR9GEzkAA'; // census choropleth tutorial
@@ -374,14 +381,10 @@ function cb4mouseMove_dbgBoxInfo(e) {
 // this callback fn handle the date slider event
 function cb4event_dateSlider(e) {
 		var dateInMsec = parseInt(e.target.value); // input msec since unix epoch eg 1588320000000 for 2020-05-01 
-		var jsDate = new Date( dateInMsec ); 
-
 		console.log("--trc--L344: inside slider parser cb4event_dateSlider(e).  dateInMsec read as: ", dateInMsec );
-		var dateMM = (jsDate.getMonth() + 1).toString().padStart(2,'0'); // 0-index, Jan is 0
-		var dateDD = jsDate.getDate().toString().padStart(2,'0');
-		//var dateYYYY = jsDate.getFullYear(); 
-		//var dateMM   = dateInMsec.toLocaleString("en-US", {month: "long"}) // December
-		//var dateDD   = jsDate.toLocaleString("en-US", {day: "numeric"}) // 5
+		var jsDate = new Date( dateInMsec ); 
+		var dateMM = (jsDate.getMonth() + 1).toString().padStart(2,'0'); // getMonth() Jan is 0
+		var dateDD = jsDate.getDate().toString().padStart(2,'0');        // 01
 		var dateYYYY = jsDate.toLocaleString("en-US", {year: "numeric"}) // 2020
 		var dateYYYYMMDD = dateYYYY + dateMM + dateDD ; // "20200501"
 		var dateAsNum = parseInt(dateYYYYMMDD);
@@ -480,7 +483,7 @@ function cb4map_on_load__covidtracking() {
 	// need to start with an inital filter date for the data
 	//            "filter":   ['==', ['type',  ['get', 'key']],'value']
 	//map.setFilter('cap+case', ['==', ['number',['get','date']], 20200419 ]);    // range 20200307 to 20200419 
-	map.setFilter('cap+case', ['==', ['number',['get','date']], latestAvailDataDate ]);    // range 20200307 to 20200419 
+	map.setFilter('cap+case', ['==', ['number',['get','date']], showDataDate ]);    // approx range 20200307 to 20200419 
 	document.getElementById('slider').addEventListener('input', cb4event_dateSlider );
 
 	document.getElementById('dataClassSelectorUI').addEventListener('change', cb4event_dataClassSelectorUI );
@@ -499,9 +502,19 @@ function cb4map_on_load__covidtracking() {
 
 // wait for map to load before adjusting it
 console.log("--dbg--L545: right before map.on('load',cb4map_on_load__covid)" );
-//~~map.on('load', cb4map_on_load__covid_obsolete)   // see if can read geojson data in dbg box
 map.on('load', cb4map_on_load__covidtracking)  // UI input was in this callback fn  
 console.log("--dbg--L546: right after map.on('load',cb4map_on_load__covid)" );
+//map.on('load', cb4event_dateSlider)   //NaN 
+map.on('load', function(e) {
+	console.log("--dbg--L:V09: inside a second map.on('load'...)" );
+	//document.addEventListener('DOMContentLoaded', cb4event_dateSlider)   //  chained event better?
+	document.addEventListener('DOMContentLoaded', function(event) {
+		console.log("--dbg--L:V09a: inside a cb in second map.on('load'...)" );
+		cb4event_dateSlider(event);
+		console.log("--dbg--L:V09b: after line for cb in second map.on('load'...)" );
+	})   //  chained event better?
+	console.log("--dbg--L:V10: at end of second map.on('load'...)" );
+});
 
 // these navigation control in bottom-right would make attribution bar float up on phone screen portrait mode, no good! :/
 map.addControl( new mapboxgl.NavigationControl(), 'bottom-left');  
@@ -516,6 +529,7 @@ map.addControl(new mapboxgl.AttributionControl({
 
 // invoke this once to do initial draw of date slider and set proper start date
 //cb4event_dateSlider();  // cant call this, need a param, and it cant be null
+cb4event_dateSlider;      // at least this doesnt error out, but dont seems executed
 
 console.log("--dbg--L547: the-end of script section, no more code, but likely exec early cuz of async nature and all the call backs!)" );
 
