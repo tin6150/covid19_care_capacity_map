@@ -10,7 +10,7 @@ name: Fetch new data from covidtracking and generate new gson
 # cron is min hour  day month  week 
 on:
   schedule:
-    - cron: "51 5  4 5  1"
+    - cron: "03 6  4 5  1"
       #- cron: "55 3  * *  *" 
   #release:
   #  types: [created]
@@ -43,12 +43,13 @@ jobs:
     #- run: npm ci
     #- run: npm run build --if-present
     #- run: npm test
+    - run: sudo apt install dos2unix
+    - run: which csv2json
     - run: pwd
     - run: ls -lah
     - run: bash -x ./fetchNewCaseDataFile.sh && bash -x ./AlgC_state+capa+case+calc.sh
     - run: git status
     - run: git diff state+capacity+cases.geojson
-    - run: export DATE=$(date)
     - run: export DATE=$(date) && echo g i t commit -a -m "[github action] new state+capacity+cases.geojson created on $DATE"
      
       
