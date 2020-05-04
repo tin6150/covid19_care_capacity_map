@@ -10,7 +10,7 @@ name: Fetch new data from covidtracking and generate new gson
 # cron is min hour  day month  week 
 on:
   schedule:
-    - cron: "58 4  4 5  1"
+    - cron: "38 5  4 5  1"
       #- cron: "55 3  * *  *" 
   #release:
   #  types: [created]
@@ -37,7 +37,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - run: npm list
     - run: echo "running npm install next"
-    - run: npm install d3-geo-projection d3-dsv shapefile ndjson-cli
+    - run: sudo npm install --global d3-geo-projection d3-dsv shapefile ndjson-cli
     - run: echo "npm list after install"
     - run: npm list
     #- run: npm ci
@@ -47,4 +47,8 @@ jobs:
     - run: ls -lah
     - run: bash -x ./fetchNewCaseDataFile.sh && bash -x ./AlgC_state+capa+case+calc.sh
     - run: git status
+    - run: git diff state+capacity+cases.geojson
+    - run: export DATE=$(date)
+    - run: echo g i t commit -a -m "[github action] new state+capacity+cases.geojson created on $DATE"
+     
       
