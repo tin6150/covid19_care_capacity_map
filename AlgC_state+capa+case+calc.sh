@@ -78,6 +78,10 @@ ndjson-map  'd[0].properties = { Location: d[0].Location, TotalHospitalBeds: d[1
 ndjson-reduce 'p.features.push(d), p' '{type: "FeatureCollection", features: []}'  < state+capacity+cases.remapped.ndjson  > ../${OutGson} 
 # OutGson should be state+capacity+cases.geojson  # **6b** **ndj2geo**
 
+echo "poor man data quality peek.  newest data at top"
+cat capacity+cases.ndjson | grep California | head -1
+cat capacity+cases.ndjson | grep California | tail -1
+cat capacity+cases.ndjson | grep California | head -1 | sed 's/,/\n/g' | grep  date.: | awk -F: '{print $2}' | tee ../latestDataDate.txt
 
 cd -
 

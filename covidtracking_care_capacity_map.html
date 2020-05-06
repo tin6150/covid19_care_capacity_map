@@ -22,7 +22,7 @@
 -->
 <head>
   <meta charset='utf-8' />
-  <title>COVID19 Hospital bed capacity vs utilization</title>
+  <title>COVID19 Hospital care capacity utilization</title>
   <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
 
   <script src='https://api.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.js'></script>
@@ -286,7 +286,7 @@ p {
 
 var showDataDate = 20200501;  // number, not string, // ++TODO: update when got new data, also active-date id HTML higher up
 //document.querySelector('#slider').max = 1588406400000 ;   // 2020-05-02 PST
-document.querySelector('#slider').max = new Date() - (86400000*1);  // set max to today - 1 day, would need automated daily data upload.
+document.querySelector('#slider').max = new Date() - (86400000*2);  // set max to today - N day, would need automated daily data upload.
 // HTML DOM #name is for id=name ??  .name is for class=name ?? 
 
 // define access token
@@ -488,7 +488,7 @@ console.log("--dbg--L546: right after map.on('load',cb4map_on_load__covid)" );
 // these navigation control in bottom-right would make attribution bar float up on phone screen portrait mode, no good! :/
 map.addControl( new mapboxgl.NavigationControl(), 'bottom-left');  
 //map.addControl( new mapboxgl.FullscreenControl({container: document.querySelector('body')}));
-map.addControl( new mapboxgl.FullscreenControl(), 'bottom-left');  
+map.addControl( new mapboxgl.FullscreenControl(), 'bottom-left');   // this works better, but full screen drops the overlay boxes
 
 // https://www.mapbox.com/mapbox-gl-js/api/#attributioncontrol
 map.addControl(new mapboxgl.AttributionControl({
