@@ -406,6 +406,39 @@ function cb4event_dataClassSelectorUI(e) {
 	var day = e.target.value;
 }; // end cb4event_dataClassSelectorUI(e) 
 
+
+// the chunk of code that define paint fill-color for bed utilization range from 0% (whilte), 10% (yellow) to 100% (red)
+// for %utilization attribute are: BedUtil
+function styleGradientPercent(attribute) {
+    return [
+                'interpolate',
+                ['linear'],
+                //['get', 'positive'],    //tmp use, no null here
+                //['get', 'BedUtil'],       // change field here
+                ['get', attribute],         // for %utilization attribute are: BedUtil
+                // 9 classes, multi-hue from light yellow to dark red.  need to match legend drawn by html/css
+                // https://colorbrewer2.org/?type=sequential&scheme=YlOrRd&n=9
+                0,    '#ffffff',    // adding white, hopefully null falls in here
+                0.1,  '#ffffcc',
+                  1,  '#ffeda0',
+                  5,  '#fed976',
+                10,  '#feb24c',
+                30,  '#fd8d3c',
+                50,  '#fc4e2a',
+                70,  '#e31a1c',
+                90,  '#bd0026',
+                100,  '#800026'
+		    //'fill-color': [ "curve", ["step"], ["number", ["get", "density"], 1], "#FFEDA0", 10, "#FED976", 20, "#FEB24C", 50, "#FD8D3C", 100, "#FC4E2A", 200, "#E31A1C", 500, "#BD0026", 2000, "#000000" ],
+		    // use a curve (http://bl.ocks.org/anandthakker/raw/6d0269825a7e0381cdcde13f84a0b6b0/#types-expression-curve)
+		    // of type "step," which will step through each break instead of interpolating between them.
+		    // Then, get the density value and use a `number` expression to return it as a number instead of a string.
+		    // Each step is then a pair [{color code}, {max value for break}]
+		    // Finally, add a default color code for any features that fall outside of the steps you've defined.
+		    //-"curve", ["step"], ["number", ["get", "density"], 1], "#FFEDA0", 10, "#FED976", 20, "#FEB24C", 50, "#FD8D3C", 100, "#FC4E2A", 200, "#E31A1C", 500, "#BD0026", 2000, "#000000"
+    ]
+};
+
+
 // addLayer is where lot of changes from nyc map   ++FIXME++
 //map.on('load', function() {
 function cb4map_on_load__covidtracking() {
@@ -420,6 +453,8 @@ function cb4map_on_load__covidtracking() {
 		'data': './state+capacity+cases.geojson'
 	})
 
+
+
 	console.log("--trc--L367: right before map.addLayer" )
 	map.addLayer({
 		id:   'cap+case',     // id: 'covid19-bedUtil',        //formerly id: 'covidtracking',
@@ -427,31 +462,8 @@ function cb4map_on_load__covidtracking() {
 		source: 'covid19-cap+case',
 		// https://docs.mapbox.com/mapbox-gl-js/style-spec/expressions/#interpolate
 		paint: {		///* this is the mapbox EXPRESSION api to dynamically change styling (instead of having defined it in mapbox studio as part of the layer)*/
-			'fill-color': [
-                'interpolate',
-                ['linear'],
-                //['get', 'positive'],    //tmp use, no null here
-                ['get', 'BedUtil'],       // change field here
-                // 9 classes, multi-hue from light yellow to dark red.  need to match legend drawn by html/css
-                // https://colorbrewer2.org/?type=sequential&scheme=YlOrRd&n=9
-                0,    '#ffffff',    // adding white, hopefully null falls in here
-                0.1,  '#ffffcc',
-                  1,  '#ffeda0',
-                  5,  '#fed976',
-                10,  '#feb24c',
-                30,  '#fd8d3c',
-                50,  '#fc4e2a',
-                70,  '#e31a1c',
-                90,  '#bd0026',
-                100,  '#800026'
-        	],
-		    //'fill-color': [ "curve", ["step"], ["number", ["get", "density"], 1], "#FFEDA0", 10, "#FED976", 20, "#FEB24C", 50, "#FD8D3C", 100, "#FC4E2A", 200, "#E31A1C", 500, "#BD0026", 2000, "#000000" ],
-		    // use a curve (http://bl.ocks.org/anandthakker/raw/6d0269825a7e0381cdcde13f84a0b6b0/#types-expression-curve)
-		    // of type "step," which will step through each break instead of interpolating between them.
-		    // Then, get the density value and use a `number` expression to return it as a number instead of a string.
-		    // Each step is then a pair [{color code}, {max value for break}]
-		    // Finally, add a default color code for any features that fall outside of the steps you've defined.
-		    //-"curve", ["step"], ["number", ["get", "density"], 1], "#FFEDA0", 10, "#FED976", 20, "#FEB24C", 50, "#FD8D3C", 100, "#FC4E2A", 200, "#E31A1C", 500, "#BD0026", 2000, "#000000"
+			'fill-color': 
+        styleGradientPercent('BedUtil'), //[ ],
 			  'fill-opacity': 0.3
 		},
 		layout: {}
