@@ -153,7 +153,7 @@ p {
   position: absolute;
   width: 200px;
   margin: 4px;
-  //padding: 6px 12px;
+  /*padding: 6px 12px; */
   background-color: white;
   visibility: visible;
   z-index: 10;  /* map should be at z-index 0.  want this behind the legend at tr */
@@ -454,7 +454,9 @@ function cb4map_on_load__covidtracking() {
 	})
 
 
-
+  //++ use diff addLayer for ICU count vs Ventilator
+  // or just use diff styleGradient() fn with diff attribute? 
+  // xref: getInputFormSelection (smelly)
 	console.log("--trc--L367: right before map.addLayer" )
 	map.addLayer({
 		id:   'cap+case',     // id: 'covid19-bedUtil',        //formerly id: 'covidtracking',
