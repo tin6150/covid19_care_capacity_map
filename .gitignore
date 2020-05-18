@@ -5,6 +5,8 @@ package-lock.json
 # ^^ i did npm install for some tools, but they are not really needed for this repo, just tool i use.
 #
 # tmp files i don't need checked in
+cases_daily_automaton.json
+
 singlePropertyEg.geojson
 singlePropertyEg.svg
 nestedPropertyEg.geojson
