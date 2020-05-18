@@ -238,13 +238,16 @@ p {
   <p>
   COVID19 Hospital bed utilization
   </p>
-  <!-- drop down picker selection UI -->
+  <!-- drop down picker selection UI, value field is keyed to geojson properties field -->
   <div class='session'> 
       <select id="dataClassSelectorUI">
-          <option value="Positive" disabled >Positive cases</option> 
-          <option value="BedUtil"           >Hospital Bed Utilization</option> 
-          <option value="IcuUtil"  disabled >ICU Utilization</option> 
-          <option value="VentUtil" disabled >Ventilator Utilization</option> 
+          <option value="BedUtil"                         >Hospital Bed Utilization</option> 
+          <option value="positive"               enabled  >Positive cases</option> 
+          <option value="positiveIncrease"       enabled  >Increase in Positive cases</option> 
+          <option value="inIcuCurrently"         enabled  >In ICU currently</option> 
+          <option value="IcuUtil"                disabled >ICU Utilization</option> 
+          <option value="onVentilatorCurrently"  enabled  >On Ventilator Currently</option> 
+          <option value="VentUtil"               disabled >Ventilator Utilization</option> 
       </select>
   </div>
 
@@ -295,6 +298,8 @@ mapboxgl.accessToken = 'pk.eyJ1IjoidGluMTE3IiwiYSI6ImNrNWxnd21ydjBvc2UzZG8wanQza
 // above was presented by Studio Beta 2020.0412, for covid19-Monochrome (under tin117)
 
 
+var currentLoadedDataLayer = "";    // keep track of what data layer is being displayed
+
 // const map = new mapboxgl.Map({ 
 console.log("--dbg--L242: right before new mapboxgl.Map(...)" );
 var map = new mapboxgl.Map({
@@ -324,7 +329,8 @@ function cb4mouseMove_featuresDataBoxInfo(e) {
         //console.log( "--trc-- L319: inside cb4mouseMove_featuresDataBoxInfo(...)" );
         var states = map.queryRenderedFeatures(e.point, {
             //layers: ['egPropertySingle-x3']
-            layers: ['cap+case']     // this has to match name in addLayer id
+            layers: [currentLoadedDataLayer]     // this has to match name in addLayer id
+            //layers: ['cap+case']     // this has to match name in addLayer id
             //layers: ['states']
             //layers: ['covid19-bedUtil']
         });
@@ -388,8 +394,8 @@ function cb4event_dateSlider(e) {
 		console.log("--trc--L346: inside slider parser cb4event_dateSlider(e).  dateAsNum set to: ", dateAsNum );
 
 		// so mapbox API still used to do the filtering... think of grep for data locally before render/update the map
-		map.setFilter('cap+case', ['==', ['number',['get','date']], dateAsNum ]);    // approx expected range 20200307 to 20200419 
-		//             ^^^1^^^^                      ^2^^^^^^2^^     ^^3^
+		map.setFilter(currentLoadedDataLayer, ['==', ['number',['get','date']], dateAsNum ]);    // approx expected range 20200307 to 20200419 
+		//             ^^^1^^^^                                  ^2^^^^^^2^^     ^^3^
 		// ^1^: the first param for setFilter, match the name of 'id' for map.addLayer(...)
 		// ^2^: 'date' is one of the properties in the .geojson
 		// ^3^: 'dateAsNum' is read as var from parseInt(e...) 
@@ -400,10 +406,31 @@ function cb4event_dateSlider(e) {
 
 }; // end cb4event_dateSlider(e)
 
-function cb4event_dataClassSelectorUI(e) { 
-	console.log("--trc--L363: inside cb4event_dataClassSelectorUI(e)" );
-	// need to eventually respond to change to IcuUtil, Ventilator Utilization, etc
-	var day = e.target.value;
+	
+
+// callback to respond to change to IcuUtil, Ventilator Utilization, etc
+function cb4event_dataClassSelectorUI(evt) { 
+	console.log("--trc--L413: inside cb4event_dataClassSelectorUI(evt)" );
+
+	var inputFormSelection = document.getElementById("dataClassSelectorUI").value; // keyed between html UI and geojson.  eg BedUtil, inIcuCurrently, positive, ...
+	if( currentLoadedDataLayer != "" ) {
+		console.log("--trc--L419: cb4event_dataClassSelectorUI(evt) -- removingLayer:", currentLoadedDataLayer );
+		//rmLayerCounter++;
+		map.removeLayer( currentLoadedDataLayer )
+	}
+	currentLoadedDataLayer = inputFormSelection;  
+	var addStatus = map.addLayer({
+		id:     currentLoadedDataLayer, 
+		type:   'fill',
+		source: 'covid19-cap+case',
+		//paint:  { 'fill-color': styleGradientCount('positive'), 'fill-opacity': 0.3 } ,  //++ TODO 
+		paint:  { 'fill-color': styleGradientCount(currentLoadedDataLayer), 'fill-opacity': 0.3 } ,  
+		layout: {}
+	})
+	console.log("--trc--L429: cb4event_dataClassSelectorUI(evt) -- addLayer added:", currentLoadedDataLayer );
+
+	// dont remember if below was really needed or just some old code.
+	//~ var day = evt.target.value;
 }; // end cb4event_dataClassSelectorUI(e) 
 
 
@@ -436,10 +463,34 @@ function styleGradientPercent(attribute) {
 		    // Finally, add a default color code for any features that fall outside of the steps you've defined.
 		    //-"curve", ["step"], ["number", ["get", "density"], 1], "#FFEDA0", 10, "#FED976", 20, "#FEB24C", 50, "#FD8D3C", 100, "#FC4E2A", 200, "#E31A1C", 500, "#BD0026", 2000, "#000000"
     ]
-};
+}; // end styleGradientPercent()
+
+// the chunk of code that define paint fill-color for utilization as count (ie number of actual IcuBed or ventilator used)
+// it is an acutal number, and not sure what's high. 
+// so range for now is playing with it.  not sure if using max() would be good idea or not.  probably not
+// attribute would be "potitive", ...
+function styleGradientCount(attribute) {
+    return [
+		'interpolate',
+		['linear'],
+		//['get', 'positive'],    //tmp use, no null here
+		['get', attribute],         // for %utilization attribute are: BedUtil
+		// 9 classes, multi-hue from light yellow to dark red.  need to match legend drawn by html/css
+		// https://colorbrewer2.org/?type=sequential&scheme=YlOrRd&n=9
+		0,    '#ffffff',    // adding white, hopefully null falls in here
+		0.1,  '#ffffcc',
+		10,  '#ffeda0',
+		100,  '#fed976',
+		1000,  '#feb24c',
+		10000,  '#fd8d3c',
+		100000,  '#fc4e2a',
+		1000000,  '#e31a1c',
+		10000000,  '#bd0026',
+		100000000,  '#800026'
+    ]
+}; // end styleGradientCount()
 
 
-// addLayer is where lot of changes from nyc map   ++FIXME++
 //map.on('load', function() {
 function cb4map_on_load__covidtracking() {
 	console.log("--trc--L240: in cb4map_on_load__covidtracking()" );
@@ -454,30 +505,30 @@ function cb4map_on_load__covidtracking() {
 	})
 
 
-  //++ use diff addLayer for ICU count vs Ventilator
-  // or just use diff styleGradient() fn with diff attribute? 
-  // xref: getInputFormSelection (smelly)
-	console.log("--trc--L367: right before map.addLayer" )
+	// this is seeding the map once on initial load with BedUtil data for the choropleth
+	// diff addLayer for ICU count vs Ventilator would be loaded when UI change
+	// xref: getInputFormSelection (smelly)
+	console.log("--trc--L510: right before map.addLayer -- expect 1 time add only" )
 	map.addLayer({
-		id:   'cap+case',     // id: 'covid19-bedUtil',        //formerly id: 'covidtracking',
+		id:   'BedUtil',  //id:   'cap+case',     // id: 'covid19-bedUtil',        //formerly id: 'covidtracking',
 		type: 'fill', // 'vector'
 		source: 'covid19-cap+case',
 		// https://docs.mapbox.com/mapbox-gl-js/style-spec/expressions/#interpolate
 		paint: {		///* this is the mapbox EXPRESSION api to dynamically change styling (instead of having defined it in mapbox studio as part of the layer)*/
-			'fill-color': 
-        styleGradientPercent('BedUtil'), //[ ],
-			  'fill-opacity': 0.3
+			'fill-color':   styleGradientPercent('BedUtil'), //[ ],
+			'fill-opacity': 0.3
 		},
 		layout: {}
 
 	});  // end map.addLayer()
-	console.log("--trc--L434: after code for map.addLayer()" );
+	currentLoadedDataLayer = "BedUtil";    // keep track of what data layer is being displayed
+	console.log("--trc--L525: after code for map.addLayer() -- currentLoadedDataLayer is:", currentLoadedDataLayer );
 
 	
 	// need to start with an inital filter date for the data
 	//            "filter":   ['==', ['type',  ['get', 'key']],'value']
 	//map.setFilter('cap+case', ['==', ['number',['get','date']], 20200419 ]);    // range 20200307 to 20200419 
-	map.setFilter('cap+case', ['==', ['number',['get','date']], showDataDate ]);    // approx range 20200307 to 20200419 
+	map.setFilter(currentLoadedDataLayer, ['==', ['number',['get','date']], showDataDate ]);    // approx range 20200307 to 20200419 
 	document.getElementById('slider').addEventListener('input', cb4event_dateSlider );
 
 	document.getElementById('dataClassSelectorUI').addEventListener('change', cb4event_dataClassSelectorUI );
@@ -486,7 +537,7 @@ function cb4map_on_load__covidtracking() {
 	map.on('mousemove', cb4mouseMove_dbgBoxInfo);			//BL, BR overlay
 	map.on('mousemove', cb4mouseMove_featuresDataBoxInfo);  //TL overlay
 
-	console.log("--trc--L459: at the end of cb4map_on_load__covidtracking()" );
+	console.log("--trc--L459: at the end of cb4map_on_load__covidtracking()" ); 
 };  //end cb4map_on_load__covidtracking()
 
 
@@ -494,15 +545,9 @@ function cb4map_on_load__covidtracking() {
 // "main" running thead
 // /////////////////////////////////
 
-// wait for map to load before adjusting it
 console.log("--dbg--L545: right before map.on('load',cb4map_on_load__covid)" );
 map.on('load', cb4map_on_load__covidtracking)  // UI input was in this callback fn  
 console.log("--dbg--L546: right after map.on('load',cb4map_on_load__covid)" );
-
-// these navigation control in bottom-right would make attribution bar float up on phone screen portrait mode, no good! :/
-map.addControl( new mapboxgl.NavigationControl(), 'bottom-left');  
-//map.addControl( new mapboxgl.FullscreenControl({container: document.querySelector('body')}));
-map.addControl( new mapboxgl.FullscreenControl(), 'bottom-left');   // this works better, but full screen drops the overlay boxes
 
 // https://www.mapbox.com/mapbox-gl-js/api/#attributioncontrol
 map.addControl(new mapboxgl.AttributionControl({
