@@ -22,7 +22,7 @@
 -->
 <head>
   <meta charset='utf-8' />
-  <title>COVID19 Hospital care capacity utilization</title>
+  <title>COVID19 Hospital care capacity utilization (bld20200517)</title>
   <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
 
   <script src='https://api.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.js'></script>
@@ -236,7 +236,7 @@ p {
 <!-- nyc collision eg, top left user input "console" -->
 <div id='console'>
   <p>
-  COVID19 Hospital bed utilization
+  COVID19 care capacity util
   </p>
   <!-- drop down picker selection UI, value field is keyed to geojson properties field -->
   <div class='session'> 
@@ -255,14 +255,16 @@ p {
 		just html element!  well, actually, the css "row colors" is actually doing the color grading.    
 	originally in tutorial this is in the "console" collision UI box.  i just put it here for emphasis :P -->
 	<div class='session'>
-		<h4>Utililization in %</h4>
+		<h4><div id="LegendTitle">Utilization in %</div></h4>
 		<div class='row colors'>
 		</div>
 		<div class='row labels'>
-		  <div class='label'>0</div>
-		  <div class='label'>25</div>
-		  <div class='label'>50</div>
-		  <div class='label'>100+</div>
+			<div id="LegendText">
+				<div class='label'>0</div>
+				<div class='label'>25</div>
+				<div class='label'>50</div>
+				<div class='label'>100+</div>
+			</div>
 		</div>
 	</div>
 
@@ -384,14 +386,14 @@ function cb4mouseMove_dbgBoxInfo(e) {
 // this callback fn handle the date slider event
 function cb4event_dateSlider(e) {
 		var dateInMsec = parseInt(e.target.value); // input msec since unix epoch eg 1588320000000 for 2020-05-01 
-		console.log("--trc--L344: inside slider parser cb4event_dateSlider(e).  dateInMsec read as: ", dateInMsec );
+		//console.log("--trc--L344: inside slider parser cb4event_dateSlider(e).  dateInMsec read as: ", dateInMsec );
 		var jsDate = new Date( dateInMsec ); 
 		var dateMM = (jsDate.getMonth() + 1).toString().padStart(2,'0'); // getMonth() Jan is 0
 		var dateDD = jsDate.getDate().toString().padStart(2,'0');        // 01
 		var dateYYYY = jsDate.toLocaleString("en-US", {year: "numeric"}) // 2020
 		var dateYYYYMMDD = dateYYYY + dateMM + dateDD ; // "20200501"
 		var dateAsNum = parseInt(dateYYYYMMDD);
-		console.log("--trc--L346: inside slider parser cb4event_dateSlider(e).  dateAsNum set to: ", dateAsNum );
+		//console.log("--trc--L346: inside slider parser cb4event_dateSlider(e).  dateAsNum set to: ", dateAsNum );
 
 		// so mapbox API still used to do the filtering... think of grep for data locally before render/update the map
 		map.setFilter(currentLoadedDataLayer, ['==', ['number',['get','date']], dateAsNum ]);    // approx expected range 20200307 to 20200419 
@@ -411,6 +413,7 @@ function cb4event_dateSlider(e) {
 // callback to respond to change to IcuUtil, Ventilator Utilization, etc
 function cb4event_dataClassSelectorUI(evt) { 
 	console.log("--trc--L413: inside cb4event_dataClassSelectorUI(evt)" );
+	var addStatus = "";
 
 	var inputFormSelection = document.getElementById("dataClassSelectorUI").value; // keyed between html UI and geojson.  eg BedUtil, inIcuCurrently, positive, ...
 	if( currentLoadedDataLayer != "" ) {
@@ -418,19 +421,37 @@ function cb4event_dataClassSelectorUI(evt) {
 		//rmLayerCounter++;
 		map.removeLayer( currentLoadedDataLayer )
 	}
-	currentLoadedDataLayer = inputFormSelection;  
-	var addStatus = map.addLayer({
-		id:     currentLoadedDataLayer, 
-		type:   'fill',
-		source: 'covid19-cap+case',
-		//paint:  { 'fill-color': styleGradientCount('positive'), 'fill-opacity': 0.3 } ,  //++ TODO 
-		paint:  { 'fill-color': styleGradientCount(currentLoadedDataLayer), 'fill-opacity': 0.3 } ,  
-		layout: {}
-	})
+
+	var reqDataLayer = inputFormSelection;  // store the layer did user requested in HTML UI
+	if( reqDataLayer == "BedUtil") {
+		// Utilization in percentage 0-100%+
+		addStatus = map.addLayer({
+			id:     reqDataLayer, 
+			type:   'fill',
+			source: 'covid19-cap+case',
+			paint:  { 'fill-color': styleGradientPercent(reqDataLayer), 'fill-opacity': 0.3 } ,  
+			layout: {}
+		})
+		console.log("--dbg--L427: cb4event_dataClassSelectorUI(evt) -- addLayer status:", addStatus );
+		document.getElementById('LegendTitle').innerHTML="Utilization in %";
+		document.getElementById('LegendText').innerHTML="<div class='label'>0</div> <div class='label'>25</div> <div class='label'>50</div> <div class='label'>100+</div>";
+	} else {
+		// Utilization in absolute number
+		addStatus = map.addLayer({
+			id:     reqDataLayer, 
+			type:   'fill',
+			source: 'covid19-cap+case',
+			//paint:  { 'fill-color': styleGradientCount('positive'), 'fill-opacity': 0.3 } ,  //++ TODO 
+			paint:  { 'fill-color': styleGradientCount(reqDataLayer), 'fill-opacity': 0.3 } ,  
+			layout: { 'visibility': "visible"}
+		})
+		console.log("--dbg--L428: cb4event_dataClassSelectorUI(evt) -- addLayer status:", addStatus );
+		document.getElementById('LegendTitle').innerHTML="Utilization count";
+		document.getElementById('LegendText').innerHTML="<div class='label'>0</div> <div class='label'>1k</div> <div class='label'>1M</div> <div class='label'>1G+</div>";
+	}
+	currentLoadedDataLayer = reqDataLayer;
 	console.log("--trc--L429: cb4event_dataClassSelectorUI(evt) -- addLayer added:", currentLoadedDataLayer );
 
-	// dont remember if below was really needed or just some old code.
-	//~ var day = evt.target.value;
 }; // end cb4event_dataClassSelectorUI(e) 
 
 
