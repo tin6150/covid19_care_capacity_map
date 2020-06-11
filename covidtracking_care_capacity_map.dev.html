@@ -555,8 +555,8 @@ function cb4map_on_load__covidtracking() {
 	document.getElementById('dataClassSelectorUI').addEventListener('change', cb4event_dataClassSelectorUI );
 
 	console.log("--trc--L456: right before map.on('mousemove', cb...) " );
-	map.on('mousemove', cb4mouseMove_dbgBoxInfo);			//BL, BR overlay
-	map.on('mousemove', cb4mouseMove_featuresDataBoxInfo);  //TL overlay
+	map.on('mousemove', cb4mouseMove_dbgBoxInfo);			// BL, BR overlay
+	map.on('mousemove', cb4mouseMove_featuresDataBoxInfo);  // TR overlay
 
 	console.log("--trc--L459: at the end of cb4map_on_load__covidtracking()" ); 
 };  //end cb4map_on_load__covidtracking()
@@ -579,7 +579,24 @@ map.addControl(new mapboxgl.AttributionControl({
 // wanted to invoke this once to do initial draw of date slider and set proper start date, but dont work
 cb4event_dateSlider;      // at least this doesnt error out, but dont seems executed
 
-console.log("--dbg--L547: the-end of script section, no more code, but likely exec early cuz of async nature and all the call backs!)" );
+
+// trying a draw to see if it help with refresh
+// https://gis.stackexchange.com/questions/344406/dynamical-refresh-of-mapbox-layers-after-drawing-edits
+map.on('draw.update', function(){
+  console.log('--trc--L585: map.on(draw.update)');
+  cb4event_dateSlider 
+});
+// does not ever seems to be called :/
+
+//map.on('moveend') broke map
+//styledata, could not get triggered
+//map.once('styledata', function(){
+  //console.log('--trc--L591: map.once(styledata)');
+  //cb4event_dateSlider  
+//});
+
+
+console.log("--dbg--L999: the-end of script section, no more code, but likely exec early cuz of async nature and all the call backs!)" );
 
 
 // js callbacks tutorial: https://github.com/maxogden/art-of-node#callbacks
