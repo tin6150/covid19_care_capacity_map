@@ -13,7 +13,7 @@ DATA SOURCES
 ============
 
 * https://covidtracking.com/data  and  https://covidtracking.com/api for case count
-* kpp.org for Hospital bed capacity
+* https://kff.org for Hospital bed capacity
 
 
 Ref
@@ -28,7 +28,7 @@ Ref
 ABOUT
 =====
 
-(cc) copyleft BY-SA.
+(cc) copyleft creative commons BY-SA.
 Tin Ho [tin (at) berkeley.edu]
 
 Special thanks to Mapbox for generously providing free tier usage for their map platform!

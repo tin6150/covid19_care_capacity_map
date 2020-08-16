@@ -10,7 +10,7 @@ DEV NOTES
 
 
 * https://www.kff.org/health-costs/issue-brief/state-data-and-policy-actions-to-address-coronavirus/#stateleveldata
-    - ploy this against a map of population data, per state.
+    - plot this against a map of population data, per state.
     - kff on same page has covid19 cases and deaths, but no date on the data…
 
 	
