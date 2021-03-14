@@ -13,7 +13,9 @@ name: Fetch new data from covidtracking and generate new gson
 # cron is min hour  day month  week 
 on:
   schedule:
-    - cron:  "38 0  * *  *" 
+    #- cron:  "38 0  * *  *" 
+    # largely disabling this cron job: need to fix year wrapping since pandemic data > 1 year.
+    - cron:  "38 0  1 1  1" 
     #- cron: "55 3  * *  *" 
     #- cron: "10 7  * *  *"
     #- cron: "15 6  4 5  1"
