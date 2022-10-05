@@ -1,3 +1,6 @@
+.. image:: covid19_hospital_bed_utilization_map_screenshot.png
+
+
 covid19_care_capacity_map
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
