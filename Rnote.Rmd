@@ -15,6 +15,11 @@ Knit to html and the result is still visible in the web :)
 
 (gis class may need a Rgis.Rmd, dont put those here)
 
+html is like 4M, trying to keep PSG from over growth, so moving this Rnote
+to 
+https://tin6150.github.io/covid19_care_capacity_map/Rnote.html
+
+other Rgis.html Rmd would follow.
 
 
 xref:
