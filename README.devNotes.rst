@@ -192,6 +192,8 @@ Pros and cons of single .geojson vs many files, one per date:
 - multiple file will be tried method as done for previous data viz proj with mapbox.
 - maybe mood point now, dont actually need to upload to mapbox and generate tileset (though that may actually be faster?)
 
+- mapbox charge for storage and processing tileset, charge is per area covered.  Single tileset with multiple layer of data may be cheaper than multiple tileset of single layer of data.  (check into details...)
+
 
 Algorithm and steps
 ===================
