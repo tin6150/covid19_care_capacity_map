@@ -1,0 +1,73 @@
+
+Seeding a GIS with R notebook.
+
+First touched on this from the R 251 class.
+see R_phw251_bonus_problem_set.html
+
+**^ tin zink ~/tin-gh/PHW251_Fall2022/problem sets/problem set bonus ^**>  wc problem_set_bonus.Rmd 
+
+```{r, setup }
+
+library(pacman)
+p_load(tidyverse)
+p_load(plotly)
+
+```
+
+
+```{r, plotly_web_cholopleth_eg, include=T }
+
+# ref example from plotly web site 
+# https://plotly.com/r/choropleth-maps/
+
+df <- read.csv("https://raw.githubusercontent.com/plotly/datasets/master/2011_us_ag_exports.csv")
+df$hover <- with(df, paste(state, '<br>', "Beef", beef, "Dairy", dairy, "<br>",
+                           "Fruits", total.fruits, "Veggies", total.veggies,
+                           "<br>", "Wheat", wheat, "Corn", corn))
+
+fig <- plot_geo(df, locationmode = 'USA-states')
+fig <- fig %>% add_trace(
+    z = ~total.exports, text = ~hover, locations = ~code,
+    color = ~total.exports, colors = 'Purples'
+  )
+fig <- fig %>% colorbar(title = "Millions USD")
+fig <- fig %>% layout(
+    title = '2011 US Agriculture Exports by State<br>(Hover for breakdown)'
+  )
+
+fig
+```
+
+```{r PHW251_bonus_problem_set_Q14}
+## add hover pop up text as extra col of data to DF
+df_suicide$hover = with(
+  df_suicide,
+  paste( NAME, '<br>',
+         'Death Rate: ', RATE,    '<br>',
+         'Death: '     , DEATHS,  '<br>'
+         ) 
+)
+
+map_q14 = plot_ly(df_suicide,
+        type="choropleth",
+        locationmode = "USA-states") %>%
+  layout(geo=list(scope="usa"))   %>% add_trace(
+    z            = ~RATE
+    , text       = ~hover
+    , locations  = ~STATE
+    , color      = ~RATE
+    , colors     = 'Purples'
+  )  %>%   
+  layout(      
+    title = paste(
+      "Suicide Mortality by State in 2018"
+      , "<br> The number of deaths per 100,000 total population"
+) )
+
+
+map_q14 # map renders well in Rstudio, but not to pdf.
+
+
+```
+
+
