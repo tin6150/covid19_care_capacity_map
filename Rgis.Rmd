@@ -4,6 +4,8 @@ Seeding a GIS with R notebook.
 First touched on this from the R 251 class.
 see R_phw251_bonus_problem_set.html
 
+#ref choropleth
+
 **^ tin zink ~/tin-gh/PHW251_Fall2022/problem sets/problem set bonus ^**>  wc problem_set_bonus.Rmd 
 
 ```{r, setup }
@@ -38,7 +40,20 @@ fig <- fig %>% layout(
 fig
 ```
 
-```{r PHW251_bonus_problem_set_Q14}
+PHW251_bonus_problem_set_Q14
+(https://github.com/tin6150/PHW251_Fall2022/blob/main/problem%20sets/problem%20set%20bonus/problem_set_bonus.Rmd)[https://github.com/tin6150/PHW251_Fall2022/blob/main/problem%20sets/problem%20set%20bonus/problem_set_bonus.Rmd]
+
+
+```{r gis_choropleth, include=T}
+
+suicide_CSV_file="https://raw.githubusercontent.com/tin6150/PHW251_Fall2022/main/problem%20sets/problem%20set%20bonus/data/Suicide%20Mortality%20by%20State.csv"
+
+# data pulled from CDC website described above 
+#df_suicide <- read_csv("data/Suicide Mortality by State.csv") %>%
+df_suicide <- read_csv(suicide_CSV_file) %>%
+    filter(YEAR == 2018)
+
+
 ## add hover pop up text as extra col of data to DF
 df_suicide$hover = with(
   df_suicide,
