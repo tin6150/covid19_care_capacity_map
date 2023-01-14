@@ -17,6 +17,11 @@ p_load(plotly)
 ```
 
 
+# Reference materials
+
+* (sf cheat sheet)[https://github.com/r-spatial/sf#cheatsheet] 
+
+
 ```{r, plotly_web_cholopleth_eg, include=T }
 
 # ref example from plotly web site 
@@ -85,4 +90,84 @@ map_q14 # map renders well in Rstudio, but not to pdf.
 
 ```
 
+xref:  ~/Dropbox/mph_hw/gis_phw272a/example_index.Sn50.txt  for many gis related constructs from intro GIS in R class
 
+PHW 292A - GIS intro with R
+Week 1: Introduction to Geographic Information Systems (GIS) for Public Health
+January 10–15
+
+https://bcourses.berkeley.edu/courses/1521079/pages/week-1
+
+```{r gis272A_wk1}
+
+p_load( dplyr )
+p_load( ggplot2 )
+# sf need below, installed on Zink
+# sudo apt install libudunits2-dev
+p_load( sf )
+p_load( sp )
+p_load( tigris )
+p_load( geodata )
+p_load( raster )
+p_load( paletteer ) # this is the fixed, corrected package name
+
+# from lab1, clever pacman
+
+package_list = c("ggplot2", "dplyr", "sf", "rgdal", "raster", "here", "scales")
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(package_list, character.only=TRUE)
+
+
+# load shapefile, display it 
+wk1_ca_shape_file_path = "/home/tin/Dropbox/mph_hw/gis_phw272a/wk1/lab1/CA_Counties/CA_Counties_TIGER2016.shp"
+
+## x11(type = "cairo")        ## use this to create display if not using Rmd notebook
+
+wk1_ca_shpSn50 = st_read( ca_shape_file_path )
+class( wk1_ca_shpSn50 )
+ggplot() + geom_sf( data=wk1_ca_shpSn50 )
+
+```
+
+
+```{r gis272A_wk1_interpretation_assignment}
+
+## Part 5 page 11 of wk1 interpretation assignment
+## file:///home/tin/Dropbox/mph_hw/gis_phw272a/wk1/wk1_gis272a.InterpretationAssignment_SpatialDataFrames.pdf
+
+p_load( tigris )
+
+# tigris: https://www.rdocumentation.org/packages/tigris/versions/1.6.1
+# download TIGER/Line shape file directly (US Census)
+# internet connection req, data is not "installed" as part of tigris pkg install
+# but cached for future use
+
+# tracts are 1:500k 
+wk1_assign_shp_Bay = 
+  tracts( state='CA',
+          county = c("Alameda", "Contra Costa", "Marin",
+                     "Napa", "San Francisco", "San Mateo",
+                     "Santa Clara", "Solano", "Sonoma")  
+          )
+
+# counties are 1:500k; 1:5m; 1:20m
+wk1_assign_shp_CA = counties( state="CA" )
+
+# many other features can be downloaded, regions, places, zctas, area_water, urban_areas, native_areas, rails...
+
+class(wk1_assign_shp_Bay)  # sf
+class(wk1_assign_shp_CA)   # sf
+
+# several way to plot shape data
+ggplot( wk1_assign_shp_Bay ) + geom_sf() 
+
+ggplot() + geom_sf( data=wk1_assign_shp_CA )
+
+ggplot( wk1_assign_shp_Bay ) + geom_sf() + geom_sf( data=wk1_assign_shp_CA )
+ggplot() + geom_sf( data=wk1_assign_shp_Bay ) + geom_sf( data=wk1_assign_shp_CA )
+# either of the above lines, the 2nd geom_sf() data overwrite the 1st load.  
+
+# ah, but plot state first, then bay area tracts, work!
+ggplot() +  geom_sf( data=wk1_assign_shp_CA ) + geom_sf( data=wk1_assign_shp_Bay )
+
+```
